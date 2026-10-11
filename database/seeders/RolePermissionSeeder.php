@@ -36,6 +36,11 @@ class RolePermissionSeeder extends Seeder
             'users.delete',
 
             'roles.manage',
+
+            'pesanan-pembelian.view',
+            'pesanan-pembelian.create',
+            'pesanan-pembelian.update',
+            'pesanan-pembelian.delete',
         ];
 
         foreach ($allPermissions as $permission) {
@@ -62,6 +67,10 @@ class RolePermissionSeeder extends Seeder
             'permintaan-pembelian.create',
             'permintaan-pembelian.update',
             'permintaan-pembelian.print',
+
+            'pesanan-pembelian.view',
+            'pesanan-pembelian.create',
+            'pesanan-pembelian.update',
         ]);
 
         // Berikan role Admin kepada akun administrator yang sudah dibuat.

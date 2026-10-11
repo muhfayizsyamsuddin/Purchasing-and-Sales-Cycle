@@ -6,6 +6,7 @@ use App\Http\Controllers\MVendorController;
 use App\Http\Controllers\TPermintaanPembelianController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PesananPembelianController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -147,4 +148,54 @@ Route::middleware('auth')->group(function () {
     Route::put('/roles/{role}', [RoleController::class, 'update'])
         ->middleware('can:roles.manage')
         ->name('roles.update');
+
+    // Pesanan Pembelian
+    Route::get('/pesanan-pembelian', [
+        PesananPembelianController::class,
+        'index',
+    ])
+        ->middleware('can:pesanan-pembelian.view')
+        ->name('pesanan-pembelian.index');
+
+    Route::get('/pesanan-pembelian/create', [
+        PesananPembelianController::class,
+        'create',
+    ])
+        ->middleware('can:pesanan-pembelian.create')
+        ->name('pesanan-pembelian.create');
+
+    Route::post('/pesanan-pembelian', [
+        PesananPembelianController::class,
+        'store',
+    ])
+        ->middleware('can:pesanan-pembelian.create')
+        ->name('pesanan-pembelian.store');
+
+    Route::get('/pesanan-pembelian/{pesanan_pembelian}/edit', [
+        PesananPembelianController::class,
+        'edit',
+    ])
+        ->middleware('can:pesanan-pembelian.update')
+        ->name('pesanan-pembelian.edit');
+
+    Route::put('/pesanan-pembelian/{pesanan_pembelian}', [
+        PesananPembelianController::class,
+        'update',
+    ])
+        ->middleware('can:pesanan-pembelian.update')
+        ->name('pesanan-pembelian.update');
+
+    Route::get(
+        '/pesanan-pembelian/{pesanan_pembelian}/cetak',
+        [PesananPembelianController::class, 'cetak']
+    )
+        ->middleware('can:pesanan-pembelian.view')
+        ->name('pesanan-pembelian.print');
+    
+    Route::delete('/pesanan-pembelian/{pesanan_pembelian}', [
+        PesananPembelianController::class,
+        'destroy',
+    ])
+        ->middleware('can:pesanan-pembelian.delete')
+        ->name('pesanan-pembelian.destroy');
 });
