@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PesananPembelianController;
 use App\Http\Controllers\PenerimaanBarangController;
+use App\Http\Controllers\FakturPembelianController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -246,4 +247,47 @@ Route::middleware('auth')->group(function () {
         [PenerimaanBarangController::class, 'destroy']
     )->middleware('can:penerimaan-barang.delete')
         ->name('penerimaan-barang.destroy');
+
+    // Faktur Pembelian
+    Route::get(
+        '/faktur-pembelian',
+        [FakturPembelianController::class, 'index']
+    )->middleware('can:faktur-pembelian.view')
+        ->name('faktur-pembelian.index');
+
+    Route::get(
+        '/faktur-pembelian/create',
+        [FakturPembelianController::class, 'create']
+    )->middleware('can:faktur-pembelian.create')
+        ->name('faktur-pembelian.create');
+
+    Route::post(
+        '/faktur-pembelian',
+        [FakturPembelianController::class, 'store']
+    )->middleware('can:faktur-pembelian.create')
+        ->name('faktur-pembelian.store');
+
+    Route::get(
+        '/faktur-pembelian/{no_faktur}/cetak',
+        [FakturPembelianController::class, 'cetak']
+    )->middleware('can:faktur-pembelian.view')
+        ->name('faktur-pembelian.cetak');
+
+    Route::get(
+        '/faktur-pembelian/{no_faktur}/edit',
+        [FakturPembelianController::class, 'edit']
+    )->middleware('can:faktur-pembelian.update')
+        ->name('faktur-pembelian.edit');
+
+    Route::put(
+        '/faktur-pembelian/{no_faktur}',
+        [FakturPembelianController::class, 'update']
+    )->middleware('can:faktur-pembelian.update')
+        ->name('faktur-pembelian.update');
+
+    Route::delete(
+        '/faktur-pembelian/{no_faktur}',
+        [FakturPembelianController::class, 'destroy']
+    )->middleware('can:faktur-pembelian.delete')
+        ->name('faktur-pembelian.destroy');
 });
