@@ -14,7 +14,7 @@ class TPermintaanPembelianController extends Controller
     public function index()
     {
         $permintaans = TPermintaanPembelian::with('details.barang')
-            ->latest('id_permintaan')
+            ->latest('no_faktur')
             ->paginate(10);
 
         return view(
@@ -40,7 +40,7 @@ class TPermintaanPembelianController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'unique:t_permintaan_pembelian,no_faktur',
+                'unique:permintaan_pembelian,no_faktur',
             ],
             'tanggal' => [
                 'required',
@@ -141,8 +141,8 @@ class TPermintaanPembelianController extends Controller
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('t_permintaan_pembelian', 'no_faktur')
-                    ->ignore($permintaan->id_permintaan, 'id_permintaan'),
+                Rule::unique('permintaan_pembelian', 'no_faktur')
+                    ->ignore($permintaan->no_faktur, 'no_faktur'),
             ],
             'tanggal' => [
                 'required',

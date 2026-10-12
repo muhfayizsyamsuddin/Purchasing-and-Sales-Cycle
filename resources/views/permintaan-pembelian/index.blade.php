@@ -57,7 +57,7 @@
                         <td>
                             @can('permintaan-pembelian.update')
                                 <a
-                                    href="{{ route('permintaan-pembelian.edit', $permintaan->id_permintaan) }}"
+                                    href="{{ route('permintaan-pembelian.edit', $permintaan->no_faktur) }}"
                                     class="btn btn-sm btn-outline"
                                 >
                                     Edit
@@ -65,7 +65,7 @@
                             @endcan
                             @can('permintaan-pembelian.print')
                                 <a
-                                    href="{{ route('permintaan-pembelian.print', $permintaan->id_permintaan) }}"
+                                    href="{{ route('permintaan-pembelian.print', $permintaan->no_faktur) }}"
                                     target="_blank"
                                     rel="noopener"
                                     class="btn btn-sm btn-outline"
@@ -76,7 +76,7 @@
 
                             @can('permintaan-pembelian.delete')
                                 <form
-                                    action="{{ route('permintaan-pembelian.destroy', $permintaan->id_permintaan) }}"
+                                    action="{{ route('permintaan-pembelian.destroy', $permintaan->no_faktur) }}"
                                     method="POST"
                                     style="display: inline"
                                     onsubmit="return confirm('Yakin ingin menghapus permintaan ini?')"

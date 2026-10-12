@@ -34,7 +34,7 @@
         @endphp
 
         <form
-            action="{{ route('permintaan-pembelian.update', $permintaan->id_permintaan) }}"
+            action="{{ route('permintaan-pembelian.update', $permintaan->no_faktur) }}"
             method="POST"
         >
             @csrf

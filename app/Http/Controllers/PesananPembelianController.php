@@ -222,7 +222,12 @@ class PesananPembelianController extends Controller
                 'integer',
                 'exists:m_vendor,id_vendor',
             ],
-            'no_faktur' => ['nullable', 'string', 'max:255'],
+            'no_faktur' => [
+                'nullable',
+                'string',
+                'max:255',
+                'exists:permintaan_pembelian,no_faktur',
+            ],
             'ppn' => ['nullable', 'numeric', 'min:0'],
             'details' => ['required', 'array', 'min:1'],
             'details.*.sku' => [

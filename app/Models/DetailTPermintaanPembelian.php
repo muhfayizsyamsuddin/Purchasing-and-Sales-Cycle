@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DetailTPermintaanPembelian extends Model
 {
-    protected $table = 'detail_t_permintaan_pembelian';
+    protected $table = 'detail_m_permintaan_pembelian';
 
     protected $primaryKey = 'id_detail';
 
     protected $fillable = [
-        'id_permintaan',
+        'no_faktur',
         'sku',
         'kuantitas',
         'keterangan',
@@ -22,8 +22,8 @@ class DetailTPermintaanPembelian extends Model
     {
         return $this->belongsTo(
             TPermintaanPembelian::class,
-            'id_permintaan',
-            'id_permintaan'
+            'no_faktur',
+            'no_faktur'
         );
     }
 

@@ -9,7 +9,11 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PesananPembelianController;
 
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        return redirect('/dashboard');
+    }
+
+    return redirect('/login');
 });
 
 Route::middleware('auth')->group(function () {

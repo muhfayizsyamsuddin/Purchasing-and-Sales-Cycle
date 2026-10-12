@@ -7,9 +7,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TPermintaanPembelian extends Model
 {
-    protected $table = 't_permintaan_pembelian';
+    protected $table = 'permintaan_pembelian';
 
-    protected $primaryKey = 'id_permintaan';
+    protected $primaryKey = 'no_faktur';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
 
     protected $fillable = [
         'no_faktur',
@@ -23,8 +27,8 @@ class TPermintaanPembelian extends Model
     {
         return $this->hasMany(
             DetailTPermintaanPembelian::class,
-            'id_permintaan',
-            'id_permintaan'
+            'no_faktur',
+            'no_faktur'
         );
     }
 }
