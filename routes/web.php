@@ -7,6 +7,7 @@ use App\Http\Controllers\TPermintaanPembelianController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PesananPembelianController;
+use App\Http\Controllers\PenerimaanBarangController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -202,4 +203,47 @@ Route::middleware('auth')->group(function () {
     ])
         ->middleware('can:pesanan-pembelian.delete')
         ->name('pesanan-pembelian.destroy');
+
+    // Penerimaan Barang
+    Route::get(
+        '/penerimaan-barang',
+        [PenerimaanBarangController::class, 'index']
+    )->middleware('can:penerimaan-barang.view')
+        ->name('penerimaan-barang.index');
+
+    Route::get(
+        '/penerimaan-barang/create',
+        [PenerimaanBarangController::class, 'create']
+    )->middleware('can:penerimaan-barang.create')
+        ->name('penerimaan-barang.create');
+
+    Route::post(
+        '/penerimaan-barang',
+        [PenerimaanBarangController::class, 'store']
+    )->middleware('can:penerimaan-barang.create')
+        ->name('penerimaan-barang.store');
+
+    Route::get(
+        '/penerimaan-barang/{no_penerimaan}/cetak',
+        [PenerimaanBarangController::class, 'cetak']
+    )->middleware('can:penerimaan-barang.view')
+        ->name('penerimaan-barang.print');
+
+    Route::get(
+        '/penerimaan-barang/{no_penerimaan}/edit',
+        [PenerimaanBarangController::class, 'edit']
+    )->middleware('can:penerimaan-barang.update')
+        ->name('penerimaan-barang.edit');
+
+    Route::put(
+        '/penerimaan-barang/{no_penerimaan}',
+        [PenerimaanBarangController::class, 'update']
+    )->middleware('can:penerimaan-barang.update')
+        ->name('penerimaan-barang.update');
+
+    Route::delete(
+        '/penerimaan-barang/{no_penerimaan}',
+        [PenerimaanBarangController::class, 'destroy']
+    )->middleware('can:penerimaan-barang.delete')
+        ->name('penerimaan-barang.destroy');
 });

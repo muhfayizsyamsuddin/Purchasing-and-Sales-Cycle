@@ -55,4 +55,13 @@ class PesananPembelian extends Model
             'id_vendor'
         );
     }
+
+    public function penerimaans(): HasMany
+    {
+        return $this->hasMany(
+            PenerimaanBarang::class,
+            'no_order_pembelian',
+            'no_order_pembelian'
+        );
+    }
 }
