@@ -14,6 +14,7 @@ use App\Http\Controllers\ReturPembelianController;
 use App\Http\Controllers\PesananPenjualanController;
 use App\Http\Controllers\PengirimanPesananController;
 use App\Http\Controllers\FakturPenjualanController;
+use App\Http\Controllers\PembayaranPenjualanController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -474,4 +475,33 @@ Route::middleware('auth')->group(function () {
     Route::get('/faktur-penjualan/{no_faktur}/cetak', [FakturPenjualanController::class, 'cetak'])
         ->name('faktur-penjualan.print')
         ->middleware('can:faktur-penjualan.view');
+
+    // Pembayaran Penjualan
+    Route::get('/pembayaran-penjualan', [PembayaranPenjualanController::class, 'index'])
+        ->name('pembayaran-penjualan.index')
+        ->middleware('can:pembayaran-penjualan.view');
+
+    Route::get('/pembayaran-penjualan/create', [PembayaranPenjualanController::class, 'create'])
+        ->name('pembayaran-penjualan.create')
+        ->middleware('can:pembayaran-penjualan.create');
+
+    Route::post('/pembayaran-penjualan', [PembayaranPenjualanController::class, 'store'])
+        ->name('pembayaran-penjualan.store')
+        ->middleware('can:pembayaran-penjualan.create');
+
+    Route::get('/pembayaran-penjualan/{no_pembayaran}/edit', [PembayaranPenjualanController::class, 'edit'])
+        ->name('pembayaran-penjualan.edit')
+        ->middleware('can:pembayaran-penjualan.update');
+
+    Route::put('/pembayaran-penjualan/{no_pembayaran}', [PembayaranPenjualanController::class, 'update'])
+        ->name('pembayaran-penjualan.update')
+        ->middleware('can:pembayaran-penjualan.update');
+
+    Route::delete('/pembayaran-penjualan/{no_pembayaran}', [PembayaranPenjualanController::class, 'destroy'])
+        ->name('pembayaran-penjualan.destroy')
+        ->middleware('can:pembayaran-penjualan.delete');
+
+    Route::get('/pembayaran-penjualan/{no_pembayaran}/cetak', [PembayaranPenjualanController::class, 'cetak'])
+        ->name('pembayaran-penjualan.print')
+        ->middleware('can:pembayaran-penjualan.view');
 });

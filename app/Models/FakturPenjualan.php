@@ -54,4 +54,13 @@ class FakturPenjualan extends Model
             'no_faktur'
         );
     }
+
+    public function pembayaran(): HasMany
+    {
+        return $this->hasMany(
+            PembayaranPenjualan::class,
+            'no_faktur',
+            'no_faktur'
+        );
+    }
 }
