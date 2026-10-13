@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PengirimanPesanan extends Model
 {
@@ -35,6 +36,15 @@ class PengirimanPesanan extends Model
     {
         return $this->hasMany(
             DetailMPengirimanPesanan::class,
+            'id_pengiriman_pesanan',
+            'id_pengiriman_pesanan'
+        );
+    }
+
+    public function fakturPenjualan(): HasOne
+    {
+        return $this->hasOne(
+            FakturPenjualan::class,
             'id_pengiriman_pesanan',
             'id_pengiriman_pesanan'
         );

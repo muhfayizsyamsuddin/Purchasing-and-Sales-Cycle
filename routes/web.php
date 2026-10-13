@@ -13,6 +13,7 @@ use App\Http\Controllers\PembayaranPembelianController;
 use App\Http\Controllers\ReturPembelianController;
 use App\Http\Controllers\PesananPenjualanController;
 use App\Http\Controllers\PengirimanPesananController;
+use App\Http\Controllers\FakturPenjualanController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -444,4 +445,33 @@ Route::middleware('auth')->group(function () {
     )
         ->name('pengiriman-pesanan.print')
         ->middleware('can:pengiriman-pesanan.view');
+
+    // Faktur Penjualan
+    Route::get('/faktur-penjualan', [FakturPenjualanController::class, 'index'])
+        ->name('faktur-penjualan.index')
+        ->middleware('can:faktur-penjualan.view');
+
+    Route::get('/faktur-penjualan/create', [FakturPenjualanController::class, 'create'])
+        ->name('faktur-penjualan.create')
+        ->middleware('can:faktur-penjualan.create');
+
+    Route::post('/faktur-penjualan', [FakturPenjualanController::class, 'store'])
+        ->name('faktur-penjualan.store')
+        ->middleware('can:faktur-penjualan.create');
+
+    Route::get('/faktur-penjualan/{no_faktur}/edit', [FakturPenjualanController::class, 'edit'])
+        ->name('faktur-penjualan.edit')
+        ->middleware('can:faktur-penjualan.update');
+
+    Route::put('/faktur-penjualan/{no_faktur}', [FakturPenjualanController::class, 'update'])
+        ->name('faktur-penjualan.update')
+        ->middleware('can:faktur-penjualan.update');
+
+    Route::delete('/faktur-penjualan/{no_faktur}', [FakturPenjualanController::class, 'destroy'])
+        ->name('faktur-penjualan.destroy')
+        ->middleware('can:faktur-penjualan.delete');
+
+    Route::get('/faktur-penjualan/{no_faktur}/cetak', [FakturPenjualanController::class, 'cetak'])
+        ->name('faktur-penjualan.print')
+        ->middleware('can:faktur-penjualan.view');
 });
