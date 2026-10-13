@@ -49,4 +49,13 @@ class PengirimanPesanan extends Model
             'id_pengiriman_pesanan'
         );
     }
+
+    public function returPenjualan(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(
+            ReturPenjualan::class,
+            'id_pengiriman_pesanan',
+            'id_pengiriman_pesanan'
+        );
+    }
 }

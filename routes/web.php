@@ -15,6 +15,7 @@ use App\Http\Controllers\PesananPenjualanController;
 use App\Http\Controllers\PengirimanPesananController;
 use App\Http\Controllers\FakturPenjualanController;
 use App\Http\Controllers\PembayaranPenjualanController;
+use App\Http\Controllers\ReturPenjualanController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -504,4 +505,33 @@ Route::middleware('auth')->group(function () {
     Route::get('/pembayaran-penjualan/{no_pembayaran}/cetak', [PembayaranPenjualanController::class, 'cetak'])
         ->name('pembayaran-penjualan.print')
         ->middleware('can:pembayaran-penjualan.view');
+
+    // Retur Penjualan
+    Route::get('/retur-penjualan', [ReturPenjualanController::class, 'index'])
+        ->middleware('can:retur-penjualan.view')
+        ->name('retur-penjualan.index');
+
+    Route::get('/retur-penjualan/create', [ReturPenjualanController::class, 'create'])
+        ->middleware('can:retur-penjualan.create')
+        ->name('retur-penjualan.create');
+
+    Route::post('/retur-penjualan', [ReturPenjualanController::class, 'store'])
+        ->middleware('can:retur-penjualan.create')
+        ->name('retur-penjualan.store');
+
+    Route::get('/retur-penjualan/{no_retur}/edit', [ReturPenjualanController::class, 'edit'])
+        ->middleware('can:retur-penjualan.update')
+        ->name('retur-penjualan.edit');
+
+    Route::put('/retur-penjualan/{no_retur}', [ReturPenjualanController::class, 'update'])
+        ->middleware('can:retur-penjualan.update')
+        ->name('retur-penjualan.update');
+
+    Route::delete('/retur-penjualan/{no_retur}', [ReturPenjualanController::class, 'destroy'])
+        ->middleware('can:retur-penjualan.delete')
+        ->name('retur-penjualan.destroy');
+
+    Route::get('/retur-penjualan/{no_retur}/cetak', [ReturPenjualanController::class, 'cetak'])
+        ->middleware('can:retur-penjualan.view')
+        ->name('retur-penjualan.print');
 });

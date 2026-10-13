@@ -81,6 +81,11 @@ class RolePermissionSeeder extends Seeder
             'pembayaran-penjualan.create',
             'pembayaran-penjualan.update',
             'pembayaran-penjualan.delete',
+
+            'retur-penjualan.view',
+            'retur-penjualan.create',
+            'retur-penjualan.update',
+            'retur-penjualan.delete',
         ];
 
         foreach ($allPermissions as $permission) {
@@ -143,6 +148,10 @@ class RolePermissionSeeder extends Seeder
             'pembayaran-penjualan.view',
             'pembayaran-penjualan.create',
             'pembayaran-penjualan.update',
+
+            'retur-penjualan.view',
+            'retur-penjualan.create',
+            'retur-penjualan.update',
         ]);
 
         // Berikan role Admin kepada akun administrator yang sudah dibuat.
