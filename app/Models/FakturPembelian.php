@@ -56,4 +56,13 @@ class FakturPembelian extends Model
             'no_faktur'
         );
     }
+
+    public function pembayaran(): HasMany
+    {
+        return $this->hasMany(
+            PembayaranPembelian::class,
+            'no_faktur',
+            'no_faktur'
+        );
+    }
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PesananPembelianController;
 use App\Http\Controllers\PenerimaanBarangController;
 use App\Http\Controllers\FakturPembelianController;
+use App\Http\Controllers\PembayaranPembelianController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -290,4 +291,47 @@ Route::middleware('auth')->group(function () {
         [FakturPembelianController::class, 'destroy']
     )->middleware('can:faktur-pembelian.delete')
         ->name('faktur-pembelian.destroy');
+
+    // Pembayaran Pembelian
+    Route::get(
+        '/pembayaran-pembelian',
+        [PembayaranPembelianController::class, 'index']
+    )->middleware('can:pembayaran-pembelian.view')
+        ->name('pembayaran-pembelian.index');
+
+    Route::get(
+        '/pembayaran-pembelian/create',
+        [PembayaranPembelianController::class, 'create']
+    )->middleware('can:pembayaran-pembelian.create')
+        ->name('pembayaran-pembelian.create');
+
+    Route::post(
+        '/pembayaran-pembelian',
+        [PembayaranPembelianController::class, 'store']
+    )->middleware('can:pembayaran-pembelian.create')
+        ->name('pembayaran-pembelian.store');
+
+    Route::get(
+        '/pembayaran-pembelian/{no_pembayaran}/cetak',
+        [PembayaranPembelianController::class, 'cetak']
+    )->middleware('can:pembayaran-pembelian.view')
+        ->name('pembayaran-pembelian.cetak');
+
+    Route::get(
+        '/pembayaran-pembelian/{no_pembayaran}/edit',
+        [PembayaranPembelianController::class, 'edit']
+    )->middleware('can:pembayaran-pembelian.update')
+        ->name('pembayaran-pembelian.edit');
+
+    Route::put(
+        '/pembayaran-pembelian/{no_pembayaran}',
+        [PembayaranPembelianController::class, 'update']
+    )->middleware('can:pembayaran-pembelian.update')
+        ->name('pembayaran-pembelian.update');
+
+    Route::delete(
+        '/pembayaran-pembelian/{no_pembayaran}',
+        [PembayaranPembelianController::class, 'destroy']
+    )->middleware('can:pembayaran-pembelian.delete')
+        ->name('pembayaran-pembelian.destroy');
 });
