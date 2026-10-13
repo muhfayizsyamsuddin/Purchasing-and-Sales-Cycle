@@ -10,6 +10,7 @@ use App\Http\Controllers\PesananPembelianController;
 use App\Http\Controllers\PenerimaanBarangController;
 use App\Http\Controllers\FakturPembelianController;
 use App\Http\Controllers\PembayaranPembelianController;
+use App\Http\Controllers\ReturPembelianController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -334,4 +335,47 @@ Route::middleware('auth')->group(function () {
         [PembayaranPembelianController::class, 'destroy']
     )->middleware('can:pembayaran-pembelian.delete')
         ->name('pembayaran-pembelian.destroy');
+
+    // Retur Pembelian
+    Route::get(
+        '/retur-pembelian',
+        [ReturPembelianController::class, 'index']
+    )->middleware('can:retur-pembelian.view')
+        ->name('retur-pembelian.index');
+
+    Route::get(
+        '/retur-pembelian/create',
+        [ReturPembelianController::class, 'create']
+    )->middleware('can:retur-pembelian.create')
+        ->name('retur-pembelian.create');
+
+    Route::post(
+        '/retur-pembelian',
+        [ReturPembelianController::class, 'store']
+    )->middleware('can:retur-pembelian.create')
+        ->name('retur-pembelian.store');
+
+    Route::get(
+        '/retur-pembelian/{no_retur}/cetak',
+        [ReturPembelianController::class, 'cetak']
+    )->middleware('can:retur-pembelian.view')
+        ->name('retur-pembelian.cetak');
+
+    Route::get(
+        '/retur-pembelian/{no_retur}/edit',
+        [ReturPembelianController::class, 'edit']
+    )->middleware('can:retur-pembelian.update')
+        ->name('retur-pembelian.edit');
+
+    Route::put(
+        '/retur-pembelian/{no_retur}',
+        [ReturPembelianController::class, 'update']
+    )->middleware('can:retur-pembelian.update')
+        ->name('retur-pembelian.update');
+
+    Route::delete(
+        '/retur-pembelian/{no_retur}',
+        [ReturPembelianController::class, 'destroy']
+    )->middleware('can:retur-pembelian.delete')
+        ->name('retur-pembelian.destroy');
 });

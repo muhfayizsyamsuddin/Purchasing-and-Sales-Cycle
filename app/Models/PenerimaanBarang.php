@@ -46,4 +46,13 @@ class PenerimaanBarang extends Model
             'no_penerimaan'
         );
     }
+
+    public function returPembelian(): HasMany
+    {
+        return $this->hasMany(
+            ReturPembelian::class,
+            'no_penerimaan',
+            'no_penerimaan'
+        );
+    }
 }
