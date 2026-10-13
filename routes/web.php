@@ -12,6 +12,7 @@ use App\Http\Controllers\FakturPembelianController;
 use App\Http\Controllers\PembayaranPembelianController;
 use App\Http\Controllers\ReturPembelianController;
 use App\Http\Controllers\PesananPenjualanController;
+use App\Http\Controllers\PengirimanPesananController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -411,4 +412,36 @@ Route::middleware('auth')->group(function () {
     )
         ->name('pesanan-penjualan.print')
         ->middleware('can:pesanan-penjualan.view');
+
+    // Pengiriman Pesanan
+    Route::get('/pengiriman-pesanan', [PengirimanPesananController::class, 'index'])
+        ->name('pengiriman-pesanan.index')
+        ->middleware('can:pengiriman-pesanan.view');
+
+    Route::get('/pengiriman-pesanan/create', [PengirimanPesananController::class, 'create'])
+        ->name('pengiriman-pesanan.create')
+        ->middleware('can:pengiriman-pesanan.create');
+
+    Route::post('/pengiriman-pesanan', [PengirimanPesananController::class, 'store'])
+        ->name('pengiriman-pesanan.store')
+        ->middleware('can:pengiriman-pesanan.create');
+
+    Route::get('/pengiriman-pesanan/{id_pengiriman_pesanan}/edit', [PengirimanPesananController::class, 'edit'])
+        ->name('pengiriman-pesanan.edit')
+        ->middleware('can:pengiriman-pesanan.update');
+
+    Route::put('/pengiriman-pesanan/{id_pengiriman_pesanan}', [PengirimanPesananController::class, 'update'])
+        ->name('pengiriman-pesanan.update')
+        ->middleware('can:pengiriman-pesanan.update');
+
+    Route::delete('/pengiriman-pesanan/{id_pengiriman_pesanan}', [PengirimanPesananController::class, 'destroy'])
+        ->name('pengiriman-pesanan.destroy')
+        ->middleware('can:pengiriman-pesanan.delete');
+
+    Route::get(
+        '/pengiriman-pesanan/{id_pengiriman_pesanan}/cetak',
+        [PengirimanPesananController::class, 'cetak']
+    )
+        ->name('pengiriman-pesanan.print')
+        ->middleware('can:pengiriman-pesanan.view');
 });
