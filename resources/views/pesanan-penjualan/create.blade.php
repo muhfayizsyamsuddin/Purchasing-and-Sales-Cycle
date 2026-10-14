@@ -116,20 +116,20 @@
             </div>
 
             <div class="form-group">
-                <label for="PPN" class="form-label">
+                <label for="ppn" class="form-label">
                     PPN (nominal)
                 </label>
                 <input
                     type="number"
-                    id="PPN"
-                    name="PPN"
-                    value="{{ old('PPN', 0) }}"
+                    id="ppn"
+                    name="ppn"
+                    value="{{ old('ppn', 0) }}"
                     class="form-control"
                     min="0"
                     step="0.01"
                     required
                 >
-                @error('PPN')
+                @error('ppn')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
             </div>

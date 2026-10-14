@@ -261,7 +261,7 @@
             <tr>
                 <td>PPN</td>
                 <td>
-                    {{ number_format((float) $pesanan->PPN, 2, ',', '.') }}
+                    {{ number_format((float) $pesanan->ppn, 2, ',', '.') }}
                 </td>
             </tr>
             <tr>

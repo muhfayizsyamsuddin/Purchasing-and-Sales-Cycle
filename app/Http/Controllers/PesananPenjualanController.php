@@ -39,7 +39,7 @@ class PesananPenjualanController extends Controller
             'tanggal' => ['required', 'date'],
             'nama_pembeli' => ['required', 'string', 'max:255'],
             'alamat' => ['required', 'string'],
-            'PPN' => ['required', 'numeric', 'min:0'],
+            'ppn' => ['required', 'numeric', 'min:0'],
             'details' => ['required', 'array', 'min:1'],
             'details.*.sku' => ['required', 'exists:m_barang,sku'],
             'details.*.kuantitas' => ['required', 'integer', 'min:1'],
@@ -49,7 +49,7 @@ class PesananPenjualanController extends Controller
 
         $details = $this->prepareDetails($validated['details']);
         $subtotal = collect($details)->sum('total_harga');
-        $ppn = (float) $validated['PPN'];
+        $ppn = (float) $validated['ppn'];
 
         DB::transaction(function () use (
             $validated,
@@ -63,7 +63,7 @@ class PesananPenjualanController extends Controller
                 'nama_pembeli' => $validated['nama_pembeli'],
                 'alamat' => $validated['alamat'],
                 'jumlah' => $subtotal,
-                'PPN' => $ppn,
+                'ppn' => $ppn,
                 'total_harga' => $subtotal + $ppn,
             ]);
 
@@ -119,7 +119,7 @@ class PesananPenjualanController extends Controller
             'tanggal' => ['required', 'date'],
             'nama_pembeli' => ['required', 'string', 'max:255'],
             'alamat' => ['required', 'string'],
-            'PPN' => ['required', 'numeric', 'min:0'],
+            'ppn' => ['required', 'numeric', 'min:0'],
             'details' => ['required', 'array', 'min:1'],
             'details.*.sku' => ['required', 'exists:m_barang,sku'],
             'details.*.kuantitas' => ['required', 'integer', 'min:1'],
@@ -129,7 +129,7 @@ class PesananPenjualanController extends Controller
 
         $details = $this->prepareDetails($validated['details']);
         $subtotal = collect($details)->sum('total_harga');
-        $ppn = (float) $validated['PPN'];
+        $ppn = (float) $validated['ppn'];
 
         DB::transaction(function () use (
             $pesanan,
@@ -144,7 +144,7 @@ class PesananPenjualanController extends Controller
                 'nama_pembeli' => $validated['nama_pembeli'],
                 'alamat' => $validated['alamat'],
                 'jumlah' => $subtotal,
-                'PPN' => $ppn,
+                'ppn' => $ppn,
                 'total_harga' => $subtotal + $ppn,
             ]);
 

@@ -58,7 +58,7 @@
                                 {{ number_format((float) $pesanan->jumlah, 2, ',', '.') }}
                             </td>
                             <td>
-                                {{ number_format((float) $pesanan->PPN, 2, ',', '.') }}
+                                {{ number_format((float) $pesanan->ppn, 2, ',', '.') }}
                             </td>
                             <td>
                                 {{ number_format((float) $pesanan->total_harga, 2, ',', '.') }}
