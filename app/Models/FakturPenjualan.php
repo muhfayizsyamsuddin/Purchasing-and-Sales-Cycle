@@ -24,7 +24,7 @@ class FakturPenjualan extends Model
         'tanggal',
         'jangka_waktu_pembayaran',
         'jumlah',
-        'PPN',
+        'ppn',
         'total_harga',
         'id_pengiriman_pesanan',
     ];
@@ -32,7 +32,7 @@ class FakturPenjualan extends Model
     protected $casts = [
         'tanggal' => 'date',
         'jumlah' => 'decimal:2',
-        'PPN' => 'decimal:2',
+        'ppn' => 'decimal:2',
         'total_harga' => 'decimal:2',
         'id_pengiriman_pesanan' => 'integer',
     ];

@@ -250,7 +250,7 @@
                 <tr>
                     <td>PPN</td>
                     <td class="number">
-                        Rp {{ number_format((float) $retur->PPN, 2, ',', '.') }}
+                        Rp {{ number_format((float) $retur->ppn, 2, ',', '.') }}
                     </td>
                 </tr>
                 <tr class="grand-total">

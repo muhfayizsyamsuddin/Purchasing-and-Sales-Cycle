@@ -47,7 +47,7 @@ class FakturPenjualanController extends Controller
         );
 
         $jumlah = collect($details)->sum('total_harga');
-        $ppn = (float) $validated['PPN'];
+        $ppn = (float) $validated['ppn'];
 
         DB::transaction(function () use (
             $validated,
@@ -64,7 +64,7 @@ class FakturPenjualanController extends Controller
                 'jangka_waktu_pembayaran' =>
                     $validated['jangka_waktu_pembayaran'],
                 'jumlah' => $jumlah,
-                'PPN' => $ppn,
+                'ppn' => $ppn,
                 'total_harga' => $jumlah + $ppn,
                 'id_pengiriman_pesanan' =>
                     $validated['id_pengiriman_pesanan'],
@@ -115,7 +115,7 @@ class FakturPenjualanController extends Controller
         );
 
         $jumlah = collect($details)->sum('total_harga');
-        $ppn = (float) $validated['PPN'];
+        $ppn = (float) $validated['ppn'];
 
         DB::transaction(function () use (
             $faktur,
@@ -133,7 +133,7 @@ class FakturPenjualanController extends Controller
                 'jangka_waktu_pembayaran' =>
                     $validated['jangka_waktu_pembayaran'],
                 'jumlah' => $jumlah,
-                'PPN' => $ppn,
+                'ppn' => $ppn,
                 'total_harga' => $jumlah + $ppn,
                 'id_pengiriman_pesanan' =>
                     $validated['id_pengiriman_pesanan'],
@@ -189,7 +189,7 @@ class FakturPenjualanController extends Controller
                 'string',
                 'max:255',
             ],
-            'PPN' => ['required', 'numeric', 'min:0'],
+            'ppn' => ['required', 'numeric', 'min:0'],
             'id_pengiriman_pesanan' => [
                 'required',
                 'integer',

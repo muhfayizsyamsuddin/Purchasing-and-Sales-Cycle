@@ -60,7 +60,7 @@
                                 {{ number_format((float) $faktur->jumlah, 2, ',', '.') }}
                             </td>
                             <td>
-                                {{ number_format((float) $faktur->PPN, 2, ',', '.') }}
+                                {{ number_format((float) $faktur->ppn, 2, ',', '.') }}
                             </td>
                             <td>
                                 {{ number_format((float) $faktur->total_harga, 2, ',', '.') }}

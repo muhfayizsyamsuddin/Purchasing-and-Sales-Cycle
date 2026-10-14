@@ -25,14 +25,14 @@ class ReturPenjualan extends Model
         'nama_penjual',
         'alamat_penjual',
         'jumlah',
-        'PPN',
+        'ppn',
         'total_harga',
     ];
 
     protected $casts = [
         'tanggal' => 'date',
         'jumlah' => 'decimal:2',
-        'PPN' => 'decimal:2',
+        'ppn' => 'decimal:2',
         'total_harga' => 'decimal:2',
     ];
 

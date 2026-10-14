@@ -366,7 +366,7 @@
                 <tr>
                     <td>PPN</td>
                     <td>
-                        {{ number_format((float) $faktur->PPN, 2, ',', '.') }}
+                        {{ number_format((float) $faktur->ppn, 2, ',', '.') }}
                     </td>
                 </tr>
                 <tr class="grand-total">

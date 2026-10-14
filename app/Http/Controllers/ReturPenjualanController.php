@@ -53,7 +53,7 @@ class ReturPenjualanController extends Controller
                 'nama_penjual' => $validated['nama_penjual'],
                 'alamat_penjual' => $validated['alamat_penjual'],
                 'jumlah' => $jumlah,
-                'PPN' => $ppn,
+                'ppn' => $ppn,
                 'total_harga' => $totalHarga,
             ]);
 
@@ -117,7 +117,7 @@ class ReturPenjualanController extends Controller
                 'nama_penjual' => $validated['nama_penjual'],
                 'alamat_penjual' => $validated['alamat_penjual'],
                 'jumlah' => $jumlah,
-                'PPN' => $ppn,
+                'ppn' => $ppn,
                 'total_harga' => $totalHarga,
             ]);
 
@@ -229,7 +229,7 @@ class ReturPenjualanController extends Controller
             'total_harga' => [
                 'prohibited',
             ],
-            'PPN' => [
+            'ppn' => [
                 'required',
                 'numeric',
                 'min:0',
@@ -345,7 +345,7 @@ class ReturPenjualanController extends Controller
         }
 
         $jumlah = round($jumlah, 2);
-        $ppn = round((float) $validated['PPN'], 2);
+        $ppn = round((float) $validated['ppn'], 2);
 
         return [
             $jumlah,

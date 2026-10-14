@@ -255,20 +255,20 @@
             </button>
 
             <div class="form-group" style="margin-top: 20px">
-                <label for="PPN" class="form-label">
+                <label for="ppn" class="form-label">
                     PPN (nominal rupiah) <span class="required">*</span>
                 </label>
                 <input
                     type="number"
-                    id="PPN"
-                    name="PPN"
+                    id="ppn"
+                    name="ppn"
                     class="form-control"
                     min="0"
                     step="0.01"
-                    value="{{ old('PPN', '0') }}"
+                    value="{{ old('ppn', '0') }}"
                     required
                 >
-                @error('PPN')
+                @error('ppn')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
             </div>
@@ -374,7 +374,7 @@
 
         const buyerName = document.getElementById('nama_pembeli');
         const buyerAddress = document.getElementById('alamat_pembeli');
-        const ppnInput = document.getElementById('PPN');
+        const ppnInput = document.getElementById('ppn');
 
         let rowIndex = 0;
 

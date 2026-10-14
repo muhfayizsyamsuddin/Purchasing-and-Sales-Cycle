@@ -207,18 +207,18 @@
             </div>
 
             <div class="form-group">
-                <label for="PPN" class="form-label">PPN (nominal)</label>
+                <label for="ppn" class="form-label">PPN (nominal)</label>
                 <input
                     type="number"
-                    id="PPN"
-                    name="PPN"
+                    id="ppn"
+                    name="ppn"
                     class="form-control"
-                    value="{{ old('PPN', $faktur->PPN) }}"
+                    value="{{ old('ppn', $faktur->ppn) }}"
                     min="0"
                     step="0.01"
                     required
                 >
-                @error('PPN')
+                @error('ppn')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
             </div>
