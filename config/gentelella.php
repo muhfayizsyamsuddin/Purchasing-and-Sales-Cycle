@@ -100,7 +100,114 @@ return [
     |
     */
 
-    'menu' => null,
+    'menu' => [
+        [
+            'label' => 'Master Data',
+            'items' => [
+                [
+                    'key' => 'barang',
+                    'text' => 'Barang',
+                    'icon' => 'tag',
+                    'route' => 'barang.index',
+                    'can' => 'barang.view',
+                ],
+                [
+                    'key' => 'vendor',
+                    'text' => 'Vendor',
+                    'icon' => 'users',
+                    'route' => 'vendor.index',
+                    'can' => 'vendor.view',
+                ],
+            ],
+        ],
+        [
+            'label' => 'Purchasing',
+            'items' => [
+                [
+                    'key' => 'permintaan-pembelian',
+                    'text' => 'Permintaan Pembelian',
+                    'icon' => 'forms',
+                    'route' => 'permintaan-pembelian.index',
+                    'can' => 'permintaan-pembelian.view',
+                ],
+                [
+                    'key' => 'pesanan-pembelian',
+                    'text' => 'Pesanan Pembelian',
+                    'icon' => 'cart',
+                    'route' => 'pesanan-pembelian.index',
+                    'can' => 'pesanan-pembelian.view',
+                ],
+                [
+                    'key' => 'penerimaan-barang',
+                    'text' => 'Penerimaan Barang',
+                    'icon' => 'files',
+                    'route' => 'penerimaan-barang.index',
+                    'can' => 'penerimaan-barang.view',
+                ],
+                [
+                    'key' => 'faktur-pembelian',
+                    'text' => 'Faktur Pembelian',
+                    'icon' => 'receipt',
+                    'route' => 'faktur-pembelian.index',
+                    'can' => 'faktur-pembelian.view',
+                ],
+                [
+                    'key' => 'pembayaran-pembelian',
+                    'text' => 'Pembayaran Pembelian',
+                    'icon' => 'receipt',
+                    'route' => 'pembayaran-pembelian.index',
+                    'can' => 'pembayaran-pembelian.view',
+                ],
+                [
+                    'key' => 'retur-pembelian',
+                    'text' => 'Retur Pembelian',
+                    'icon' => 'cart',
+                    'route' => 'retur-pembelian.index',
+                    'can' => 'retur-pembelian.view',
+                ],
+            ],
+        ],
+        [
+            'label' => 'Sales',
+            'items' => [
+                [
+                    'key' => 'pesanan-penjualan',
+                    'text' => 'Pesanan Penjualan',
+                    'icon' => 'cart',
+                    'route' => 'pesanan-penjualan.index',
+                    'can' => 'pesanan-penjualan.view',
+                ],
+                [
+                    'key' => 'pengiriman-pesanan',
+                    'text' => 'Pengiriman Pesanan',
+                    'icon' => 'files',
+                    'route' => 'pengiriman-pesanan.index',
+                    'can' => 'pengiriman-pesanan.view',
+                ],
+                [
+                    'key' => 'faktur-penjualan',
+                    'text' => 'Faktur Penjualan',
+                    'icon' => 'receipt',
+                    'route' => 'faktur-penjualan.index',
+                    'can' => 'faktur-penjualan.view',
+                ],
+                [
+                    'key' => 'pembayaran-penjualan',
+                    'text' => 'Pembayaran Penjualan',
+                    'icon' => 'receipt',
+                    'route' => 'pembayaran-penjualan.index',
+                    'can' => 'pembayaran-penjualan.view',
+                ],
+                [
+                    'key' => 'retur-penjualan',
+                    'text' => 'Retur Penjualan',
+                    'icon' => 'cart',
+                    'route' => 'retur-penjualan.index',
+                    'can' => 'retur-penjualan.view',
+                ],
+            ],
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
