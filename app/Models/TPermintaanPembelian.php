@@ -19,8 +19,6 @@ class TPermintaanPembelian extends Model
         'no_faktur',
         'tanggal',
         'tanggal_diperlukan',
-        'status',
-        'description',
     ];
 
     public function details(): HasMany

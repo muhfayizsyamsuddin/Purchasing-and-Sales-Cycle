@@ -40,7 +40,6 @@
                     <th>No. Faktur</th>
                     <th>Tanggal</th>
                     <th>Tanggal Diperlukan</th>
-                    <th>Status</th>
                     <th>Jumlah Detail</th>
                     <th>Aksi</th>
                 </tr>
@@ -52,7 +51,6 @@
                         <td>{{ $permintaan->no_faktur }}</td>
                         <td>{{ $permintaan->tanggal }}</td>
                         <td>{{ $permintaan->tanggal_diperlukan }}</td>
-                        <td>{{ $permintaan->status }}</td>
                         <td>{{ $permintaan->details->count() }}</td>
                         <td>
                             @can('permintaan-pembelian.update')
@@ -96,7 +94,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6">
+                        <td colspan="5">
                             Belum ada permintaan pembelian.
                         </td>
                     </tr>

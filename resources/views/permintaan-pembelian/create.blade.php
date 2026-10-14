@@ -74,19 +74,6 @@
                 >
             </div>
 
-            <div class="form-group">
-                <label for="description" class="form-label">
-                    Deskripsi
-                </label>
-
-                <textarea
-                    id="description"
-                    name="description"
-                    class="form-control"
-                    rows="3"
-                >{{ old('description') }}</textarea>
-            </div>
-
             <hr>
 
             <h3>Detail Barang</h3>

@@ -51,10 +51,6 @@ class TPermintaanPembelianController extends Controller
                 'date',
                 'after_or_equal:tanggal',
             ],
-            'description' => [
-                'nullable',
-                'string',
-            ],
             'details' => [
                 'required',
                 'array',
@@ -83,8 +79,6 @@ class TPermintaanPembelianController extends Controller
                 'no_faktur' => $validated['no_faktur'],
                 'tanggal' => $validated['tanggal'],
                 'tanggal_diperlukan' => $validated['tanggal_diperlukan'],
-                'description' => $validated['description'] ?? null,
-                'status' => 'Draft',
             ]);
 
             foreach ($validated['details'] as $detail) {
@@ -153,10 +147,6 @@ class TPermintaanPembelianController extends Controller
                 'date',
                 'after_or_equal:tanggal',
             ],
-            'description' => [
-                'nullable',
-                'string',
-            ],
             'details' => [
                 'required',
                 'array',
@@ -185,7 +175,6 @@ class TPermintaanPembelianController extends Controller
                 'no_faktur' => $validated['no_faktur'],
                 'tanggal' => $validated['tanggal'],
                 'tanggal_diperlukan' => $validated['tanggal_diperlukan'],
-                'description' => $validated['description'] ?? null,
             ]);
 
             // Ganti detail lama dengan detail hasil validasi.
