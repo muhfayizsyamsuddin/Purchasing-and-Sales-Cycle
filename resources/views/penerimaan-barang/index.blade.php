@@ -53,7 +53,7 @@
                         <tr>
                             <td>{{ $penerimaan->no_penerimaan }}</td>
                             <td>
-                                {{ $penerimaan->tanggal->format('d/m/Y') }}
+                                {{ $penerimaan->tanggal_penerimaan?->format('d/m/Y') ?? '-' }}
                             </td>
                             <td>
                                 {{ $penerimaan->no_order_pembelian }}

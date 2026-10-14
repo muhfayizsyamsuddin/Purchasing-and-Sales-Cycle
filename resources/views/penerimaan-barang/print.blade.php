@@ -180,7 +180,7 @@
             <tr>
                 <td>Tanggal Penerimaan</td>
                 <td>:</td>
-                <td>{{ $penerimaan->tanggal->format('d/m/Y') }}</td>
+                <td>{{ $penerimaan->tanggal_penerimaan?->format('d/m/Y') ?? '-' }}</td>
             </tr>
             <tr>
                 <td>No. Order Pembelian</td>

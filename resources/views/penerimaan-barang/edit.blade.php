@@ -93,15 +93,15 @@
                 <label for="tanggal" class="form-label">
                     Tanggal Penerimaan <span class="required">*</span>
                 </label>
+
                 <input
                     type="date"
                     id="tanggal"
-                    name="tanggal"
-                    value="{{ old('tanggal', $penerimaan->tanggal->format('Y-m-d')) }}"
-                    class="form-control"
-                    required
+                    name="tanggal_penerimaan"
+                    value="{{ old('tanggal_penerimaan', $penerimaan->tanggal_penerimaan?->format('Y-m-d')) }}"
                 >
-                @error('tanggal')
+
+                @error('tanggal_penerimaan')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
             </div>

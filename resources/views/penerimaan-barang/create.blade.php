@@ -96,12 +96,12 @@
                     <input
                         type="date"
                         id="tanggal"
-                        name="tanggal"
-                        value="{{ old('tanggal', date('Y-m-d')) }}"
+                        name="tanggal_penerimaan"
+                        value="{{ old('tanggal_penerimaan', date('Y-m-d')) }}"
                         class="form-control"
                         required
                     >
-                    @error('tanggal')
+                    @error('tanggal_penerimaan')
                         <div class="form-error">{{ $message }}</div>
                     @enderror
                 </div>
