@@ -75,7 +75,7 @@
                         <th>No. Faktur</th>
                         <th>Tanggal</th>
                         <th>Nama Pembeli</th>
-                        <th>No. Pengiriman</th>
+                        <th>Tanggal Pengiriman</th>
                         <th>Jumlah</th>
                         <th>PPN</th>
                         <th>Total Harga</th>
@@ -89,7 +89,9 @@
                             <td>{{ $faktur->no_faktur }}</td>
                             <td>{{ $faktur->tanggal?->format('d/m/Y') ?? '-' }}</td>
                             <td>{{ $faktur->nama }}</td>
-                            <td>{{ $faktur->id_pengiriman_pesanan ?? '-' }}</td>
+                            <td>
+                                {{ $faktur->pengirimanPesanan?->tanggal?->format('d/m/Y') ?? '-' }}
+                            </td>
                             <td>
                                 {{ number_format((float) $faktur->jumlah, 2, ',', '.') }}
                             </td>

@@ -36,8 +36,8 @@
             >
                 <thead>
                     <tr>
-                        <th style="width:20%;">ID Vendor</th>
-                        <th style="width:55%;">Nama Vendor</th>
+                        <th style="width:10%;">No.</th>
+                        <th style="width:65%;">Nama Vendor</th>
                         <th
                             style="width:25%; text-align:center;"
                             data-orderable="false"
@@ -50,7 +50,7 @@
                 <tbody>
                     @forelse ($vendors as $vendor)
                         <tr>
-                            <td>{{ $vendor->id_vendor }}</td>
+                            <td>{{ $vendors->firstItem() + $loop->index }}</td>
                             <td>{{ $vendor->nama_vendor }}</td>
                             <td style="text-align:center; white-space:nowrap;">
                                 @can('vendor.update')

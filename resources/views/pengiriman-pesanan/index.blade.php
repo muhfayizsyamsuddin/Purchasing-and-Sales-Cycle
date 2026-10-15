@@ -71,7 +71,7 @@
 
                 <thead>
                     <tr>
-                        <th>ID Pengiriman</th>
+                        <th>No.</th>
                         <th>Tanggal</th>
                         <th>No. Pesanan</th>
                         <th>Nama Pembeli</th>
@@ -84,7 +84,7 @@
                 <tbody>
                     @forelse ($pengirimans as $pengiriman)
                         <tr>
-                            <td>{{ $pengiriman->id_pengiriman_pesanan }}</td>
+                            <td>{{ $pengirimans->firstItem() + $loop->index }}</td>
                             <td>
                                 {{ $pengiriman->tanggal?->format('d/m/Y') ?? '-' }}
                             </td>

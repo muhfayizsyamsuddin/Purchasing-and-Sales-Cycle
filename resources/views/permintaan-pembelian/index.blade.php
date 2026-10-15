@@ -68,7 +68,7 @@
 
                 <thead>
                     <tr>
-                        <th>No. Faktur</th>
+                        <th>No. Permintaan</th>
                         <th>Tanggal</th>
                         <th>Tanggal Diperlukan</th>
                         <th>Jumlah Detail</th>

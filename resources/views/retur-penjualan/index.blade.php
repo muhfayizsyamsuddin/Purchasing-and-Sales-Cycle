@@ -76,7 +76,7 @@
                     <tr>
                         <th>No. Retur</th>
                         <th>Tanggal</th>
-                        <th>ID Pengiriman</th>
+                        <th>Tanggal Pengiriman</th>
                         <th>No. Pesanan</th>
                         <th>Nama Pembeli</th>
                         <th>Nama Penjual</th>
@@ -93,7 +93,9 @@
                         <tr>
                             <td>{{ $retur->no_retur }}</td>
                             <td>{{ $retur->tanggal?->format('d/m/Y') ?? '-' }}</td>
-                            <td>{{ $retur->id_pengiriman_pesanan }}</td>
+                            <td>
+                                {{ $retur->pengirimanPesanan?->tanggal?->format('d/m/Y') ?? '-' }}
+                            </td>
                             <td>
                                 {{ $retur->pengirimanPesanan?->pesananPenjualan?->no_pesanan ?? '-' }}
                             </td>
