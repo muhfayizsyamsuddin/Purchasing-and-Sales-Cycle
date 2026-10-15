@@ -6,37 +6,72 @@
 @section('breadcrumb', 'Home > Purchasing Cycle > Retur Pembelian')
 
 @section('content')
-    <x-gentelella::page-header
-        title="Retur Pembelian"
-        pretitle="Purchasing Cycle"
-    />
+    <div class="retur-pembelian-page">
+        <x-gentelella::page-header
+            title="Retur Pembelian"
+            pretitle="Purchasing Cycle"
+        >
+            <x-slot:actions>
+                @can('retur-pembelian.create')
+                    <x-gentelella::btn
+                        :href="route('retur-pembelian.create')"
+                        variant="primary"
+                    >
+                        Tambah Retur
+                    </x-gentelella::btn>
+                @endcan
+            </x-slot:actions>
+        </x-gentelella::page-header>
 
-    <x-gentelella::card title="Daftar Retur Pembelian">
-        @if (session('success'))
-            <div class="banner banner-success" role="alert">
-                {{ session('success') }}
-            </div>
-        @endif
+        <x-gentelella::card title="Daftar Retur Pembelian">
+            @if (session('success'))
+                <div class="banner banner-success" role="status">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-        @if (session('error'))
-            <div class="banner banner-danger" role="alert">
-                {{ session('error') }}
-            </div>
-        @endif
+            @if (session('error'))
+                <div class="banner banner-danger" role="alert">
+                    {{ session('error') }}
+                </div>
+            @endif
 
-        @can('retur-pembelian.create')
-            <div style="margin-bottom: 16px">
-                <a
-                    href="{{ route('retur-pembelian.create') }}"
-                    class="btn btn-primary"
-                >
-                    Tambah Retur
-                </a>
-            </div>
-        @endcan
+            <style>
+                .retur-pembelian-table {
+                    width: 100% !important;
+                    table-layout: fixed !important;
+                }
 
-        <div style="overflow-x: auto">
-            <x-gentelella::table>
+                .retur-pembelian-table th,
+                .retur-pembelian-table td {
+                    text-align: center !important;
+                    vertical-align: middle;
+                }
+
+                .retur-pembelian-table td:last-child {
+                    white-space: nowrap;
+                }
+            </style>
+
+            <x-gentelella::table
+                :datatable="true"
+                :page-length="10"
+                class="retur-pembelian-table"
+                style="width:100%; table-layout:fixed;"
+            >
+                <colgroup>
+                    <col style="width:10%">
+                    <col style="width:8%">
+                    <col style="width:10%">
+                    <col style="width:10%">
+                    <col style="width:10%">
+                    <col style="width:7%">
+                    <col style="width:7%">
+                    <col style="width:10%">
+                    <col style="width:11%">
+                    <col style="width:17%">
+                </colgroup>
+
                 <thead>
                     <tr>
                         <th>No. Retur</th>
@@ -48,7 +83,7 @@
                         <th>PPN</th>
                         <th>Total Harga</th>
                         <th>Jumlah Detail</th>
-                        <th>Aksi</th>
+                        <th data-orderable="false">Aksi</th>
                     </tr>
                 </thead>
 
@@ -56,7 +91,7 @@
                     @forelse ($returs as $retur)
                         <tr>
                             <td>{{ $retur->no_retur }}</td>
-                            <td>{{ $retur->tanggal->format('d/m/Y') }}</td>
+                            <td>{{ $retur->tanggal?->format('d/m/Y') ?? '-' }}</td>
                             <td>{{ $retur->no_penerimaan }}</td>
                             <td>{{ $retur->nama_pembeli }}</td>
                             <td>{{ $retur->nama_penjual }}</td>
@@ -76,24 +111,22 @@
                                         href="{{ route('retur-pembelian.cetak', $retur->no_retur) }}"
                                         class="btn btn-sm btn-outline"
                                         target="_blank"
-                                    >
-                                        Cetak
-                                    </a>
+                                        rel="noopener"
+                                    >Cetak</a>
                                 @endcan
+
                                 @can('retur-pembelian.update')
                                     <a
                                         href="{{ route('retur-pembelian.edit', $retur->no_retur) }}"
                                         class="btn btn-sm btn-outline"
-                                    >
-                                        Edit
-                                    </a>
+                                    >Edit</a>
                                 @endcan
 
                                 @can('retur-pembelian.delete')
                                     <form
                                         action="{{ route('retur-pembelian.destroy', $retur->no_retur) }}"
                                         method="POST"
-                                        style="display: inline"
+                                        style="display:inline"
                                         onsubmit="return confirm('Yakin ingin menghapus retur pembelian ini?')"
                                     >
                                         @csrf
@@ -102,26 +135,29 @@
                                         <button
                                             type="submit"
                                             class="btn btn-sm btn-outline"
-                                        >
-                                            Hapus
-                                        </button>
+                                        >Hapus</button>
                                     </form>
                                 @endcan
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10">
-                                Belum ada retur pembelian.
+                            <td colspan="10" style="padding:32px 16px;">
+                                <div style="font-weight:600; margin-bottom:4px;">
+                                    Belum ada retur pembelian
+                                </div>
+                                <div style="color:var(--text-muted); font-size:13px;">
+                                    Data retur pembelian yang dibuat akan muncul di sini.
+                                </div>
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </x-gentelella::table>
-        </div>
 
-        <div style="margin-top: 16px">
-            {{ $returs->links() }}
-        </div>
-    </x-gentelella::card>
+            <div style="margin-top:16px;">
+                {{ $returs->links() }}
+            </div>
+        </x-gentelella::card>
+    </div>
 @endsection

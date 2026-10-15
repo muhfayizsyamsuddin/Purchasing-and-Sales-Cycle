@@ -55,242 +55,454 @@
         ])->values()->all();
     @endphp
 
-    <x-gentelella::page-header
-        title="Edit Retur Penjualan"
-        pretitle="Sales Cycle"
-    />
+    <style>
+        .retur-penjualan-form-page .form-section {
+            margin-bottom: 24px;
+        }
 
-    <x-gentelella::card title="Informasi Retur Penjualan">
-        @if ($errors->any())
-            <div class="banner banner-danger" role="alert">
-                <strong>Periksa kembali input berikut:</strong>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        .retur-penjualan-form-page .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px 24px;
+        }
 
-        <form
-            action="{{ route('retur-penjualan.update', $retur->no_retur) }}"
-            method="POST"
-            id="retur-form"
-        >
-            @csrf
-            @method('PUT')
+        .retur-penjualan-form-page .form-group {
+            min-width: 0;
+            margin-bottom: 0;
+        }
 
-            <div class="form-group">
-                <label for="no_retur" class="form-label">
-                    No. Retur <span class="required">*</span>
-                </label>
-                <input
-                    type="text"
-                    id="no_retur"
-                    name="no_retur"
-                    class="form-control"
-                    value="{{ old('no_retur', $retur->no_retur) }}"
-                    maxlength="255"
-                    required
-                >
-                @error('no_retur')
-                    <div class="form-error">{{ $message }}</div>
-                @enderror
-            </div>
+        .retur-penjualan-form-page .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
 
-            <div class="form-group">
-                <label for="id_pengiriman_pesanan" class="form-label">
-                    Pengiriman Penjualan <span class="required">*</span>
-                </label>
-                <select
-                    id="id_pengiriman_pesanan"
-                    name="id_pengiriman_pesanan"
-                    class="form-control"
-                    required
-                >
-                    <option value="">Pilih pengiriman</option>
-                    @foreach ($shipmentOptions as $shipment)
-                        <option
-                            value="{{ $shipment['id'] }}"
-                            @selected((string) old('id_pengiriman_pesanan', $retur->id_pengiriman_pesanan) === (string) $shipment['id'])
-                        >
-                            {{ $shipment['label'] }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('id_pengiriman_pesanan')
-                    <div class="form-error">{{ $message }}</div>
-                @enderror
-            </div>
+        .retur-penjualan-form-page .form-control {
+            width: 100%;
+            min-width: 0;
+        }
 
-            <div class="form-group">
-                <label for="tanggal" class="form-label">
-                    Tanggal Retur <span class="required">*</span>
-                </label>
-                <input
-                    type="date"
-                    id="tanggal"
-                    name="tanggal"
-                    class="form-control"
-                    value="{{ old('tanggal', $retur->tanggal->format('Y-m-d')) }}"
-                    required
-                >
-                @error('tanggal')
-                    <div class="form-error">{{ $message }}</div>
-                @enderror
-            </div>
+        .retur-penjualan-form-page .required {
+            color: #dc3545;
+        }
 
-            <hr>
-            <h4>Informasi Pembeli</h4>
+        .retur-penjualan-form-page .form-error {
+            margin-top: 6px;
+            color: #dc3545;
+            font-size: 13px;
+        }
 
-            <div class="form-group">
-                <label for="nama_pembeli" class="form-label">
-                    Nama Pembeli <span class="required">*</span>
-                </label>
-                <input
-                    type="text"
-                    id="nama_pembeli"
-                    name="nama_pembeli"
-                    class="form-control"
-                    value="{{ old('nama_pembeli', $retur->nama_pembeli) }}"
-                    maxlength="255"
-                    required
-                >
-                @error('nama_pembeli')
-                    <div class="form-error">{{ $message }}</div>
-                @enderror
-            </div>
+        .retur-penjualan-form-page .form-help {
+            display: block;
+            margin-top: 8px;
+            color: #73808c;
+            font-size: 12px;
+        }
 
-            <div class="form-group">
-                <label for="alamat_pembeli" class="form-label">
-                    Alamat Pembeli <span class="required">*</span>
-                </label>
-                <textarea
-                    id="alamat_pembeli"
-                    name="alamat_pembeli"
-                    class="form-control"
-                    rows="3"
-                    required
-                >{{ old('alamat_pembeli', $retur->alamat_pembeli) }}</textarea>
-                @error('alamat_pembeli')
-                    <div class="form-error">{{ $message }}</div>
-                @enderror
-            </div>
+        .retur-penjualan-form-page .section-heading {
+            margin: 0 0 8px;
+            font-size: 18px;
+            font-weight: 600;
+        }
 
-            <hr>
-            <h4>Informasi Penjual</h4>
+        .retur-penjualan-form-page .section-description {
+            margin: 0 0 18px;
+            color: #a9b8ca;
+            font-size: 13px;
+        }
 
-            <div class="form-group">
-                <label for="nama_penjual" class="form-label">
-                    Nama Penjual <span class="required">*</span>
-                </label>
-                <input
-                    type="text"
-                    id="nama_penjual"
-                    name="nama_penjual"
-                    class="form-control"
-                    value="{{ old('nama_penjual', $retur->nama_penjual) }}"
-                    maxlength="255"
-                    required
-                >
-                @error('nama_penjual')
-                    <div class="form-error">{{ $message }}</div>
-                @enderror
-            </div>
+        .retur-penjualan-form-page .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
 
-            <div class="form-group">
-                <label for="alamat_penjual" class="form-label">
-                    Alamat Penjual <span class="required">*</span>
-                </label>
-                <textarea
-                    id="alamat_penjual"
-                    name="alamat_penjual"
-                    class="form-control"
-                    rows="3"
-                    required
-                >{{ old('alamat_penjual', $retur->alamat_penjual) }}</textarea>
-                @error('alamat_penjual')
-                    <div class="form-error">{{ $message }}</div>
-                @enderror
-            </div>
+        .retur-penjualan-form-page .retur-detail-table {
+            width: 100%;
+            min-width: 1100px;
+            table-layout: fixed;
+            margin-bottom: 0;
+        }
 
-            <hr>
-            <h4>Detail Barang yang Diretur</h4>
+        .retur-penjualan-form-page .retur-detail-table th,
+        .retur-penjualan-form-page .retur-detail-table td {
+            padding: 10px;
+            vertical-align: middle;
+        }
 
-            <p class="muted">
-                Pastikan jumlah retur tidak melebihi sisa barang yang belum diretur.
-            </p>
+        .retur-penjualan-form-page .retur-detail-table th {
+            text-align: center;
+            white-space: normal;
+        }
 
-            <div style="overflow-x: auto">
-                <table class="table" id="detail-table">
-                    <thead>
-                        <tr>
-                            <th>Barang</th>
-                            <th>Jumlah Tersedia</th>
-                            <th>Jumlah Retur</th>
-                            <th>Harga Unit</th>
-                            <th>Diskon</th>
-                            <th>Total Baris</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="detail-body"></tbody>
-                </table>
-            </div>
+        .retur-penjualan-form-page .retur-detail-table td:nth-child(2),
+        .retur-penjualan-form-page .retur-detail-table td:nth-child(6),
+        .retur-penjualan-form-page .retur-detail-table td:last-child {
+            text-align: center;
+        }
 
-            <button
-                type="button"
-                id="add-detail"
-                class="btn btn-outline"
+        .retur-penjualan-form-page .retur-detail-table td:last-child .btn {
+            white-space: nowrap;
+        }
+
+        .retur-penjualan-form-page .total-summary {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #344256;
+            border-radius: 6px;
+            background: #1c293a;
+            color: #f1f5f9;
+        }
+
+        .retur-penjualan-form-page .total-summary h4 {
+            margin: 0 0 18px;
+            color: #f1f5f9;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .retur-penjualan-form-page .total-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .retur-penjualan-form-page .total-label {
+            margin-bottom: 6px;
+            color: #a9b8ca;
+            font-size: 13px;
+        }
+
+        .retur-penjualan-form-page .total-value {
+            overflow-wrap: anywhere;
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .retur-penjualan-form-page .total-help {
+            margin: 16px 0 0;
+            color: #cbd5e1;
+            font-size: 12px;
+        }
+
+        .retur-penjualan-form-page .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid #344256;
+        }
+
+        @media (max-width: 767px) {
+            .retur-penjualan-form-page .form-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .retur-penjualan-form-page .total-grid {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 14px;
+            }
+        }
+    </style>
+
+    <div class="retur-penjualan-form-page">
+        <x-gentelella::page-header
+            title="Edit Retur Penjualan"
+            pretitle="Sales Cycle"
+        />
+
+        <x-gentelella::card title="Informasi Retur Penjualan">
+            @if ($errors->any())
+                <div class="banner banner-danger" role="alert">
+                    <strong>Periksa kembali input berikut:</strong>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form
+                action="{{ route('retur-penjualan.update', $retur->no_retur) }}"
+                method="POST"
+                id="retur-form"
             >
-                Tambah Baris Barang
-            </button>
+                @csrf
+                @method('PUT')
 
-            <div class="form-group" style="margin-top: 20px">
-                <label for="ppn" class="form-label">
-                    PPN (nominal rupiah) <span class="required">*</span>
-                </label>
-                <input
-                    type="number"
-                    id="ppn"
-                    name="ppn"
-                    class="form-control"
-                    min="0"
-                    step="0.01"
-                    value="{{ old('ppn', $retur->ppn) }}"
-                    required
-                >
-                @error('ppn')
-                    <div class="form-error">{{ $message }}</div>
-                @enderror
-            </div>
+                <div class="form-section">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="no_retur" class="form-label">
+                                No. Retur <span class="required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="no_retur"
+                                name="no_retur"
+                                class="form-control"
+                                value="{{ old('no_retur', $retur->no_retur) }}"
+                                maxlength="255"
+                                required
+                            >
+                            @error('no_retur')
+                                <div class="form-error">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-            <div style="margin-top: 16px; padding: 14px; border: 1px solid #ddd; border-radius: 4px">
-                <p>Subtotal setelah diskon:
-                    <strong id="subtotal-display">Rp0,00</strong>
-                </p>
-                <p>PPN:
-                    <strong id="ppn-display">Rp0,00</strong>
-                </p>
-                <p>Total retur:
-                    <strong id="total-display">Rp0,00</strong>
-                </p>
-            </div>
+                        <div class="form-group">
+                            <label for="tanggal" class="form-label">
+                                Tanggal Retur <span class="required">*</span>
+                            </label>
+                            <input
+                                type="date"
+                                id="tanggal"
+                                name="tanggal"
+                                class="form-control"
+                                value="{{ old('tanggal', $retur->tanggal->format('Y-m-d')) }}"
+                                required
+                            >
+                            @error('tanggal')
+                                <div class="form-error">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-            <div class="form-actions" style="margin-top: 20px">
-                <button type="submit" class="btn btn-primary">
-                    Simpan Perubahan
-                </button>
+                        <div class="form-group">
+                            <label for="id_pengiriman_pesanan" class="form-label">
+                                Pengiriman Penjualan <span class="required">*</span>
+                            </label>
+                            <select
+                                id="id_pengiriman_pesanan"
+                                name="id_pengiriman_pesanan"
+                                class="form-control"
+                                required
+                            >
+                                <option value="">Pilih pengiriman</option>
+                                @foreach ($shipmentOptions as $shipment)
+                                    <option
+                                        value="{{ $shipment['id'] }}"
+                                        @selected((string) old('id_pengiriman_pesanan', $retur->id_pengiriman_pesanan) === (string) $shipment['id'])
+                                    >
+                                        {{ $shipment['label'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('id_pengiriman_pesanan')
+                                <div class="form-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
 
-                <a
-                    href="{{ route('retur-penjualan.index') }}"
-                    class="btn btn-outline"
-                >
-                    Batal
-                </a>
-            </div>
-        </form>
-    </x-gentelella::card>
+                <hr>
+
+                <div class="form-section">
+                    <h3 class="section-heading">Informasi Pembeli</h3>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nama_pembeli" class="form-label">
+                                Nama Pembeli <span class="required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="nama_pembeli"
+                                name="nama_pembeli"
+                                class="form-control"
+                                value="{{ old('nama_pembeli', $retur->nama_pembeli) }}"
+                                maxlength="255"
+                                required
+                            >
+                            @error('nama_pembeli')
+                                <div class="form-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="alamat_pembeli" class="form-label">
+                                Alamat Pembeli <span class="required">*</span>
+                            </label>
+                            <textarea
+                                id="alamat_pembeli"
+                                name="alamat_pembeli"
+                                class="form-control"
+                                rows="3"
+                                required
+                            >{{ old('alamat_pembeli', $retur->alamat_pembeli) }}</textarea>
+                            @error('alamat_pembeli')
+                                <div class="form-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="form-section">
+                    <h3 class="section-heading">Informasi Penjual</h3>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nama_penjual" class="form-label">
+                                Nama Penjual <span class="required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="nama_penjual"
+                                name="nama_penjual"
+                                class="form-control"
+                                value="{{ old('nama_penjual', $retur->nama_penjual) }}"
+                                maxlength="255"
+                                required
+                            >
+                            @error('nama_penjual')
+                                <div class="form-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="alamat_penjual" class="form-label">
+                                Alamat Penjual <span class="required">*</span>
+                            </label>
+                            <textarea
+                                id="alamat_penjual"
+                                name="alamat_penjual"
+                                class="form-control"
+                                rows="3"
+                                required
+                            >{{ old('alamat_penjual', $retur->alamat_penjual) }}</textarea>
+                            @error('alamat_penjual')
+                                <div class="form-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="form-section">
+                    <h3 class="section-heading">Detail Barang yang Diretur</h3>
+                    <p class="section-description">
+                        Pastikan jumlah retur tidak melebihi sisa barang yang belum diretur.
+                    </p>
+
+                    @foreach (old('details', $initialDetails) as $index => $detail)
+                        @error("details.$index.sku")
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
+                        @error("details.$index.jumlah")
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
+                        @error("details.$index.harga_unit")
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
+                        @error("details.$index.diskon")
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
+                    @endforeach
+
+                    <div class="table-responsive">
+                        <table class="table table-striped retur-detail-table" id="detail-table">
+                            <colgroup>
+                                <col style="width: 24%">
+                                <col style="width: 12%">
+                                <col style="width: 13%">
+                                <col style="width: 14%">
+                                <col style="width: 12%">
+                                <col style="width: 14%">
+                                <col style="width: 11%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Barang</th>
+                                    <th>Jumlah Tersedia</th>
+                                    <th>Jumlah Retur</th>
+                                    <th>Harga Unit</th>
+                                    <th>Diskon</th>
+                                    <th>Total Baris</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-body"></tbody>
+                        </table>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="add-detail"
+                        class="btn btn-outline"
+                    >
+                        + Tambah Baris Barang
+                    </button>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="ppn" class="form-label">
+                                PPN (nominal rupiah) <span class="required">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id="ppn"
+                                name="ppn"
+                                class="form-control"
+                                min="0"
+                                step="0.01"
+                                value="{{ old('ppn', $retur->ppn) }}"
+                                required
+                            >
+                            @error('ppn')
+                                <div class="form-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="total-summary">
+                        <h4>Ringkasan Retur</h4>
+
+                        <div class="total-grid">
+                            <div>
+                                <div class="total-label">Subtotal setelah diskon</div>
+                                <div class="total-value" id="subtotal-display">Rp0,00</div>
+                            </div>
+
+                            <div>
+                                <div class="total-label">PPN</div>
+                                <div class="total-value" id="ppn-display">Rp0,00</div>
+                            </div>
+
+                            <div>
+                                <div class="total-label">Total Retur</div>
+                                <div class="total-value" id="total-display">Rp0,00</div>
+                            </div>
+                        </div>
+
+                        <p class="total-help">
+                            Total dihitung ulang oleh server saat data disimpan.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a
+                        href="{{ route('retur-penjualan.index') }}"
+                        class="btn btn-outline"
+                    >
+                        Batal
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </x-gentelella::card>
+    </div>
 
     <template id="detail-row-template">
         <tr data-detail-row>
@@ -475,18 +687,15 @@
                 input.addEventListener('input', () => updateRow(row));
             });
 
-            row.querySelector('[data-remove-row]').addEventListener(
-                'click',
-                () => {
-                    row.remove();
+            row.querySelector('[data-remove-row]').addEventListener('click', () => {
+                row.remove();
 
-                    if (!detailBody.querySelector('[data-detail-row]')) {
-                        addDetailRow();
-                    }
-
-                    updateSummary();
+                if (!detailBody.querySelector('[data-detail-row]')) {
+                    addDetailRow();
                 }
-            );
+
+                updateSummary();
+            });
 
             detailBody.appendChild(row);
             updateRow(row);
@@ -503,6 +712,8 @@
                     '<tr><td colspan="7" class="muted">Pilih pengiriman untuk memuat barang.</td></tr>';
 
                 addDetailButton.disabled = true;
+                buyerName.value = '';
+                buyerAddress.value = '';
                 updateSummary();
                 return;
             }

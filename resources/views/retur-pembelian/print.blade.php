@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Retur Pembelian - {{ $retur->no_retur }}</title>
 
     <style>
@@ -22,7 +23,7 @@
             background: #f1f5f9;
             font-family: Arial, Helvetica, sans-serif;
             font-size: 12px;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .toolbar {
@@ -52,7 +53,7 @@
 
         .sheet {
             width: 210mm;
-            min-height: 250mm;
+            min-height: 297mm;
             margin: 0 auto 24px;
             padding: 15mm;
             background: #fff;
@@ -71,11 +72,12 @@
         .company-name {
             margin: 0 0 5px;
             font-size: 20px;
+            font-weight: 700;
         }
 
         .document-title {
-            margin: 0 0 5px;
-            font-size: 21px;
+            margin: 0 0 4px;
+            font-size: 22px;
             text-align: right;
         }
 
@@ -88,6 +90,7 @@
             padding-bottom: 5px;
             border-bottom: 1px solid #cbd5e1;
             font-size: 13px;
+            font-weight: 700;
         }
 
         .information-grid {
@@ -102,7 +105,7 @@
         }
 
         .information-table td {
-            padding: 5px 0;
+            padding: 4px 0;
             vertical-align: top;
             overflow-wrap: anywhere;
         }
@@ -121,23 +124,27 @@
             width: 100%;
             margin-top: 10px;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         .detail-table th,
         .detail-table td {
-            padding: 8px 6px;
+            padding: 7px 5px;
             border: 1px solid #cbd5e1;
             text-align: left;
             vertical-align: top;
+            overflow-wrap: anywhere;
         }
 
         .detail-table th {
             background: #f1f5f9;
+            font-weight: 700;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         .text-right {
             text-align: right !important;
-            white-space: nowrap;
         }
 
         .text-center {
@@ -145,7 +152,7 @@
         }
 
         .totals {
-            width: 280px;
+            width: 300px;
             max-width: 100%;
             margin: 16px 0 0 auto;
             border-collapse: collapse;
@@ -168,9 +175,11 @@
         }
 
         .note {
-            margin-top: 22px;
+            margin-top: 18px;
             padding: 10px;
             border: 1px solid #cbd5e1;
+            border-radius: 3px;
+            overflow-wrap: anywhere;
         }
 
         .signatures {
@@ -199,9 +208,46 @@
             text-align: center;
         }
 
+        @media screen and (max-width: 760px) {
+            .sheet {
+                width: calc(100% - 24px);
+                min-height: 0;
+                margin: 0 12px 24px;
+                padding: 24px;
+            }
+
+            .toolbar {
+                width: calc(100% - 24px);
+            }
+
+            .document-header {
+                gap: 12px;
+            }
+
+            .company-name {
+                font-size: 15px;
+            }
+
+            .document-title {
+                font-size: 17px;
+            }
+
+            .information-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .detail-table th,
+            .detail-table td {
+                padding: 5px 4px;
+                font-size: 10px;
+            }
+        }
+
         @media print {
             body {
                 background: #fff;
+                font-size: 11px;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
@@ -218,13 +264,28 @@
                 box-shadow: none;
             }
 
-            .detail-table tr,
+            .detail-table {
+                page-break-inside: auto;
+            }
+
+            .detail-table thead {
+                display: table-header-group;
+            }
+
+            .detail-table tr {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .note,
             .signatures {
+                break-inside: avoid;
                 page-break-inside: avoid;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="toolbar">
         <a
@@ -312,12 +373,12 @@
                 <thead>
                     <tr>
                         <th style="width: 35px">No.</th>
-                        <th>SKU</th>
-                        <th>Nama Barang</th>
-                        <th class="text-right">Jumlah</th>
-                        <th class="text-right">Harga Unit</th>
-                        <th class="text-right">Diskon</th>
-                        <th class="text-right">Total Harga</th>
+                        <th style="width: 12%">SKU</th>
+                        <th style="width: 23%">Nama Barang</th>
+                        <th class="text-right" style="width: 12%">Jumlah</th>
+                        <th class="text-right" style="width: 17%">Harga Unit</th>
+                        <th class="text-right" style="width: 12%">Diskon</th>
+                        <th class="text-right" style="width: 18%">Total Harga</th>
                     </tr>
                 </thead>
 

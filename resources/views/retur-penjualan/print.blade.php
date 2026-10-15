@@ -1,279 +1,476 @@
-@extends('gentelella::page')
 
-@section('title', 'Cetak Retur Penjualan')
-@section('page_key', 'retur-penjualan')
-@section('breadcrumb', 'Home > Sales Cycle > Retur Penjualan > Cetak')
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-@section('content')
+    <title>Retur Penjualan - {{ $retur->no_retur }}</title>
+
     <style>
-        .return-document {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 32px;
-            background: #fff;
-            color: #222;
+        @page {
+            size: A4;
+            margin: 15mm;
         }
 
-        .return-document .document-header {
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: #222;
+            background: #f1f5f9;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .toolbar {
+            width: 210mm;
+            max-width: 100%;
+            margin: 20px auto 12px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .button {
+            display: inline-block;
+            border: 0;
+            border-radius: 4px;
+            padding: 9px 14px;
+            color: #fff;
+            background: #159b83;
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .button-secondary {
+            background: #475569;
+        }
+
+        .sheet {
+            width: 210mm;
+            min-height: 250mm;
+            margin: 0 auto 24px;
+            padding: 15mm;
+            background: #fff;
+            box-shadow: 0 2px 12px rgb(0 0 0 / 10%);
+        }
+
+        .document-header {
             display: flex;
             justify-content: space-between;
-            gap: 24px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #333;
-            margin-bottom: 24px;
+            align-items: flex-start;
+            gap: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #159b83;
         }
 
-        .return-document h2,
-        .return-document h3,
-        .return-document p {
-            margin-top: 0;
+        .company-name {
+            margin: 0 0 5px;
+            font-size: 20px;
+            font-weight: 700;
         }
 
-        .return-document .metadata {
+        .document-title {
+            margin: 0 0 4px;
+            font-size: 22px;
+            text-align: right;
+        }
+
+        .muted {
+            color: #64748b;
+        }
+
+        .text-right {
+            text-align: right !important;
+        }
+
+        .text-center {
+            text-align: center !important;
+        }
+
+        .section-title {
+            margin: 22px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #cbd5e1;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .information-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 24px;
-            margin-bottom: 28px;
         }
 
-        .return-document table {
+        .information-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 24px;
         }
 
-        .return-document th,
-        .return-document td {
-            border: 1px solid #ccc;
-            padding: 10px;
+        .information-table td {
+            padding: 5px 0;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+        }
+
+        .information-table td:first-child {
+            width: 42%;
+            color: #64748b;
+        }
+
+        .information-table td:nth-child(2) {
+            padding-left: 8px;
+            font-weight: 600;
+        }
+
+        .detail-table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .detail-table th,
+        .detail-table td {
+            padding: 7px 5px;
+            border: 1px solid #cbd5e1;
             text-align: left;
+            vertical-align: top;
+            overflow-wrap: anywhere;
         }
 
-        .return-document th {
-            background: #f2f2f2;
+        .detail-table th {
+            background: #f1f5f9;
+            font-weight: 700;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
-        .return-document .number {
+        .number {
+            text-align: right !important;
+            white-space: nowrap;
+        }
+
+        .totals {
+            width: 300px;
+            max-width: 100%;
+            margin: 16px 0 0 auto;
+            border-collapse: collapse;
+        }
+
+        .totals td {
+            padding: 6px 8px;
+        }
+
+        .totals td:last-child {
             text-align: right;
             white-space: nowrap;
         }
 
-        .return-document .totals {
-            width: 340px;
-            max-width: 100%;
-            margin-left: auto;
+        .grand-total td {
+            padding-top: 10px;
+            border-top: 2px solid #159b83;
+            font-size: 15px;
+            font-weight: 700;
         }
 
-        .return-document .totals td {
-            border: none;
-            border-bottom: 1px solid #ddd;
+        .note {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 3px;
+            overflow-wrap: anywhere;
         }
 
-        .return-document .grand-total {
-            font-weight: bold;
-            font-size: 1.05rem;
-        }
-
-        .return-document .signatures {
+        .signatures {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 48px;
-            margin-top: 64px;
+            gap: 40px;
+            margin-top: 48px;
+            text-align: center;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        .signature-space {
+            height: 75px;
+        }
+
+        .signature-line {
+            padding-top: 6px;
+            border-top: 1px solid #475569;
+            overflow-wrap: anywhere;
+        }
+
+        .footer {
+            margin-top: 28px;
+            padding-top: 8px;
+            border-top: 1px solid #cbd5e1;
+            color: #64748b;
+            font-size: 10px;
             text-align: center;
         }
 
-        .return-document .signature-space {
-            height: 80px;
+        @media screen and (max-width: 760px) {
+            .sheet {
+                width: calc(100% - 24px);
+                min-height: 0;
+                margin: 0 12px 24px;
+                padding: 24px;
+            }
+
+            .toolbar {
+                width: calc(100% - 24px);
+            }
+
+            .document-header {
+                gap: 12px;
+            }
+
+            .company-name {
+                font-size: 15px;
+            }
+
+            .document-title {
+                font-size: 17px;
+            }
+
+            .information-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .detail-table th,
+            .detail-table td {
+                padding: 5px 3px;
+                font-size: 10px;
+            }
         }
 
         @media print {
-            @page {
-                size: A4;
-                margin: 15mm;
-            }
-
             body {
-                background: #fff !important;
+                background: #fff;
+                font-size: 10px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
 
-            .no-print,
-            nav,
-            .sidebar-footer,
-            footer {
+            .toolbar {
                 display: none !important;
             }
 
-            .return-document {
-                max-width: none;
-                padding: 0;
+            .sheet {
+                width: auto;
+                min-height: 0;
                 margin: 0;
+                padding: 0;
+                box-shadow: none;
             }
 
-            .return-document th {
-                background: #eee !important;
-                print-color-adjust: exact;
-                -webkit-print-color-adjust: exact;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .return-document {
-                padding: 16px;
+            .detail-table {
+                page-break-inside: auto;
             }
 
-            .return-document .document-header,
-            .return-document .metadata {
-                display: block;
+            .detail-table thead {
+                display: table-header-group;
             }
 
-            .return-document .metadata > div + div {
-                margin-top: 20px;
+            .detail-table tr {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .note,
+            .signatures {
+                break-inside: avoid;
+                page-break-inside: avoid;
             }
         }
     </style>
+</head>
 
-    <div class="no-print" style="max-width: 900px; margin: 0 auto 16px">
-        <button
-            type="button"
-            class="btn btn-primary"
-            onclick="window.print()"
-        >
-            Cetak / Simpan PDF
-        </button>
-
+<body>
+    <div class="toolbar">
         <a
             href="{{ route('retur-penjualan.index') }}"
-            class="btn btn-outline"
+            class="button button-secondary"
         >
             Kembali
         </a>
+
+        <button
+            type="button"
+            class="button"
+            onclick="window.print()"
+        >
+            Cetak Retur
+        </button>
     </div>
 
-    <div class="return-document">
-        <div class="document-header">
+    <main class="sheet">
+        <header class="document-header">
             <div>
-                <h2>RETUR PENJUALAN</h2>
-                <p>Dokumen pengembalian barang dari pembeli</p>
-            </div>
-
-            <div style="text-align: right">
-                <h3>{{ $retur->no_retur }}</h3>
-                <p>
-                    Tanggal:
-                    {{ $retur->tanggal->format('d/m/Y') }}
-                </p>
-                <p>
-                    ID Pengiriman:
-                    {{ $retur->id_pengiriman_pesanan }}
-                </p>
-                <p>
-                    No. Pesanan:
-                    {{ $retur->pengirimanPesanan?->pesananPenjualan?->no_pesanan ?? '-' }}
-                </p>
-            </div>
-        </div>
-
-        <div class="metadata">
-            <div>
-                <h4>Informasi Pembeli</h4>
-                <p>
-                    <strong>{{ $retur->nama_pembeli }}</strong>
-                </p>
-                <p>
-                    {{ $retur->alamat_pembeli }}
-                </p>
+                <h1 class="company-name">Purchasing &amp; Sales Cycle</h1>
+                <div class="muted">Dokumen Transaksi Penjualan</div>
             </div>
 
             <div>
-                <h4>Informasi Penjual</h4>
-                <p>
-                    <strong>{{ $retur->nama_penjual }}</strong>
-                </p>
-                <p>
-                    {{ $retur->alamat_penjual }}
-                </p>
+                <h2 class="document-title">RETUR PENJUALAN</h2>
+                <div class="text-right">
+                    No. Retur:
+                    <strong>{{ $retur->no_retur }}</strong>
+                </div>
             </div>
-        </div>
+        </header>
 
-        <h4>Rincian Barang Retur</h4>
+        <section>
+            <h3 class="section-title">Informasi Retur</h3>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>No.</th>
-                    <th>SKU</th>
-                    <th>Nama Barang</th>
-                    <th class="number">Jumlah</th>
-                    <th class="number">Harga Unit</th>
-                    <th class="number">Diskon</th>
-                    <th class="number">Total</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @forelse ($retur->details as $detail)
+            <div class="information-grid">
+                <table class="information-table">
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $detail->sku }}</td>
-                        <td>{{ $detail->barang?->nama_barang ?? '-' }}</td>
-                        <td class="number">
-                            {{ number_format((int) $detail->jumlah, 0, ',', '.') }}
-                        </td>
-                        <td class="number">
-                            {{ number_format((float) $detail->harga_unit, 2, ',', '.') }}
-                        </td>
-                        <td class="number">
-                            {{ number_format((float) $detail->diskon, 2, ',', '.') }}
-                        </td>
-                        <td class="number">
-                            {{ number_format((float) $detail->total_harga, 2, ',', '.') }}
+                        <td>No. Retur</td>
+                        <td>{{ $retur->no_retur }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tanggal</td>
+                        <td>{{ $retur->tanggal->format('d/m/Y') }}</td>
+                    </tr>
+                    <tr>
+                        <td>ID Pengiriman</td>
+                        <td>{{ $retur->id_pengiriman_pesanan }}</td>
+                    </tr>
+                    <tr>
+                        <td>No. Pesanan</td>
+                        <td>
+                            {{ $retur->pengirimanPesanan?->pesananPenjualan?->no_pesanan ?? '-' }}
                         </td>
                     </tr>
-                @empty
+                </table>
+
+                <table class="information-table">
                     <tr>
-                        <td colspan="7" style="text-align: center">
-                            Tidak ada detail barang.
-                        </td>
+                        <td>Nama Pembeli</td>
+                        <td>{{ $retur->nama_pembeli }}</td>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
+                    <tr>
+                        <td>Alamat Pembeli</td>
+                        <td>{{ $retur->alamat_pembeli }}</td>
+                    </tr>
+                    <tr>
+                        <td>Nama Penjual</td>
+                        <td>{{ $retur->nama_penjual }}</td>
+                    </tr>
+                    <tr>
+                        <td>Alamat Penjual</td>
+                        <td>{{ $retur->alamat_penjual }}</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h3 class="section-title">Rincian Barang Retur</h3>
+
+            <table class="detail-table">
+                <thead>
+                    <tr>
+                        <th style="width: 6%">No.</th>
+                        <th style="width: 12%">SKU</th>
+                        <th style="width: 24%">Nama Barang</th>
+                        <th style="width: 10%" class="number">Jumlah</th>
+                        <th style="width: 16%" class="number">Harga Unit</th>
+                        <th style="width: 12%" class="number">Diskon</th>
+                        <th style="width: 20%" class="number">Total</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @forelse ($retur->details as $detail)
+                        <tr>
+                            <td class="text-center">{{ $loop->iteration }}</td>
+                            <td>{{ $detail->sku }}</td>
+                            <td>{{ $detail->barang?->nama_barang ?? '-' }}</td>
+                            <td class="number">
+                                {{ number_format((int) $detail->jumlah, 0, ',', '.') }}
+                            </td>
+                            <td class="number">
+                                {{ number_format((float) $detail->harga_unit, 2, ',', '.') }}
+                            </td>
+                            <td class="number">
+                                {{ number_format((float) $detail->diskon, 2, ',', '.') }}
+                            </td>
+                            <td class="number">
+                                {{ number_format((float) $detail->total_harga, 2, ',', '.') }}
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                Tidak ada detail barang.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </section>
 
         <table class="totals">
             <tbody>
                 <tr>
                     <td>Subtotal setelah diskon</td>
-                    <td class="number">
+                    <td>
                         Rp {{ number_format((float) $retur->jumlah, 2, ',', '.') }}
                     </td>
                 </tr>
                 <tr>
                     <td>PPN</td>
-                    <td class="number">
+                    <td>
                         Rp {{ number_format((float) $retur->ppn, 2, ',', '.') }}
                     </td>
                 </tr>
                 <tr class="grand-total">
                     <td>Total Retur</td>
-                    <td class="number">
+                    <td>
                         Rp {{ number_format((float) $retur->total_harga, 2, ',', '.') }}
                     </td>
                 </tr>
             </tbody>
         </table>
 
+        <div class="note">
+            <strong>Keterangan:</strong>
+            Dokumen ini mencatat barang yang dikembalikan berdasarkan
+            pengiriman pesanan yang tercantum di atas.
+        </div>
+
         <div class="signatures">
             <div>
-                <p>Pembeli,</p>
+                <div>Pembeli,</div>
                 <div class="signature-space"></div>
-                <strong>{{ $retur->nama_pembeli }}</strong>
+                <div class="signature-line">
+                    {{ $retur->nama_pembeli }}
+                </div>
             </div>
 
             <div>
-                <p>Penjual,</p>
+                <div>Penjual,</div>
                 <div class="signature-space"></div>
-                <strong>{{ $retur->nama_penjual }}</strong>
+                <div class="signature-line">
+                    {{ $retur->nama_penjual }}
+                </div>
             </div>
         </div>
-    </div>
-@endsection
+
+        <footer class="footer">
+            Dicetak dari sistem Purchasing &amp; Sales Cycle
+            pada {{ now()->format('d/m/Y H:i') }}.
+        </footer>
+    </main>
+</body>
+</html>

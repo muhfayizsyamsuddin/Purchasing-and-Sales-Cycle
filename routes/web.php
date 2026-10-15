@@ -1,5 +1,12 @@
 <?php
 
+use App\Models\MBarang;
+use App\Models\MVendor;
+use App\Models\TPermintaanPembelian;
+use App\Models\PesananPembelian;
+use App\Models\PesananPenjualan;
+use App\Models\FakturPembelian;
+use App\Models\FakturPenjualan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MBarangController;
 use App\Http\Controllers\MVendorController;
@@ -27,9 +34,29 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
     // Dashboard
-    Route::get('/dashboard', fn () => view('dashboard'))
-        ->middleware('can:dashboard.view')
-        ->name('dashboard');
+    // Route::get('/dashboard', fn () => view('dashboard'))
+    //     ->middleware('can:dashboard.view')
+    //     ->name('dashboard');
+    Route::get('/dashboard', function () {
+        return view('dashboard', [
+            'totalBarang' => MBarang::count(),
+            'totalVendor' => MVendor::count(),
+            'totalPermintaanPembelian' => TPermintaanPembelian::count(),
+            'totalPesananPembelian' => PesananPembelian::count(),
+            'totalPesananPenjualan' => PesananPenjualan::count(),
+            'totalFakturPembelian' => FakturPembelian::count(),
+            'totalFakturPenjualan' => FakturPenjualan::count(),
+            'nilaiPembelian' => PesananPembelian::sum('total_harga'),
+            'nilaiPenjualan' => PesananPenjualan::sum('total_harga'),
+            'transaksiPembelianTerbaru' => FakturPembelian::latest('tanggal')
+                ->take(5)
+                ->get(),
+
+            'transaksiPenjualanTerbaru' => FakturPenjualan::latest('tanggal')
+                ->take(5)
+                ->get(),
+        ]);
+    })->middleware('auth')->name('dashboard');
 
     // Master Barang
     Route::get('/barang', [MBarangController::class, 'index'])

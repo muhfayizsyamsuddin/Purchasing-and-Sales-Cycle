@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -9,7 +10,7 @@
     <style>
         @page {
             size: A4;
-            margin: 20mm;
+            margin: 15mm;
         }
 
         * {
@@ -21,8 +22,8 @@
             color: #222;
             background: #f1f5f9;
             font-family: Arial, Helvetica, sans-serif;
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 12px;
+            line-height: 1.5;
         }
 
         .toolbar {
@@ -35,6 +36,7 @@
         }
 
         .button {
+            display: inline-block;
             border: 0;
             border-radius: 4px;
             padding: 9px 14px;
@@ -53,7 +55,7 @@
             width: 210mm;
             min-height: 180mm;
             margin: 0 auto 24px;
-            padding: 20mm;
+            padding: 15mm;
             background: #fff;
             box-shadow: 0 2px 12px rgb(0 0 0 / 10%);
         }
@@ -69,12 +71,13 @@
 
         .company-name {
             margin: 0 0 5px;
-            font-size: 19px;
+            font-size: 20px;
+            font-weight: 700;
         }
 
         .document-title {
-            margin: 0 0 5px;
-            font-size: 21px;
+            margin: 0 0 4px;
+            font-size: 22px;
             text-align: right;
         }
 
@@ -82,11 +85,16 @@
             color: #64748b;
         }
 
+        .text-right {
+            text-align: right;
+        }
+
         .section-title {
             margin: 22px 0 10px;
             padding-bottom: 5px;
             border-bottom: 1px solid #cbd5e1;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 700;
         }
 
         .information-table {
@@ -105,12 +113,19 @@
             color: #64748b;
         }
 
+        .information-table td:nth-child(2) {
+            padding-left: 8px;
+            font-weight: 600;
+        }
+
         .payment-amount {
             margin-top: 24px;
             padding: 18px;
             border: 1px solid #cbd5e1;
             border-left: 4px solid #159b83;
             border-radius: 3px;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
 
         .payment-amount .label {
@@ -120,8 +135,10 @@
 
         .payment-amount .amount {
             margin-top: 4px;
+            color: #17212f;
             font-size: 25px;
             font-weight: 700;
+            overflow-wrap: anywhere;
         }
 
         .terbilang {
@@ -129,6 +146,14 @@
             padding: 12px;
             border: 1px solid #cbd5e1;
             border-radius: 3px;
+            overflow-wrap: anywhere;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        .terbilang-text {
+            margin-top: 5px;
+            color: #334155;
         }
 
         .signature {
@@ -136,6 +161,8 @@
             max-width: 45%;
             margin: 48px 0 0 auto;
             text-align: center;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
 
         .signature-space {
@@ -156,10 +183,43 @@
             text-align: center;
         }
 
+        @media screen and (max-width: 760px) {
+            .sheet {
+                width: calc(100% - 24px);
+                min-height: 0;
+                margin: 0 12px 24px;
+                padding: 24px;
+            }
+
+            .toolbar {
+                width: calc(100% - 24px);
+            }
+
+            .document-header {
+                gap: 12px;
+            }
+
+            .company-name {
+                font-size: 15px;
+            }
+
+            .document-title {
+                font-size: 17px;
+            }
+
+            .information-table td:first-child {
+                width: 145px;
+            }
+
+            .payment-amount .amount {
+                font-size: 21px;
+            }
+        }
+
         @media print {
             body {
                 background: #fff;
-                font-size: 12px;
+                font-size: 11px;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
@@ -176,9 +236,16 @@
                 box-shadow: none;
             }
 
+            .payment-amount {
+                border-left-color: #159b83;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
             .payment-amount,
             .terbilang,
             .signature {
+                break-inside: avoid;
                 page-break-inside: avoid;
             }
         }
@@ -212,7 +279,7 @@
 
             <div>
                 <h2 class="document-title">BUKTI PEMBAYARAN</h2>
-                <div style="text-align: right">
+                <div class="text-right">
                     No.:
                     <strong>{{ $pembayaran->no_pembayaran }}</strong>
                 </div>
@@ -225,12 +292,10 @@
             <table class="information-table">
                 <tr>
                     <td>No. Pembayaran</td>
-                    <td>
-                        <strong>{{ $pembayaran->no_pembayaran }}</strong>
-                    </td>
+                    <td>{{ $pembayaran->no_pembayaran }}</td>
                 </tr>
                 <tr>
-                    <td>Tanggal</td>
+                    <td>Tanggal Pembayaran</td>
                     <td>{{ $pembayaran->tanggal->format('d/m/Y') }}</td>
                 </tr>
                 <tr>
@@ -243,9 +308,7 @@
                 </tr>
                 <tr>
                     <td>Nama pada Faktur</td>
-                    <td>
-                        {{ $pembayaran->fakturPenjualan?->nama ?? '-' }}
-                    </td>
+                    <td>{{ $pembayaran->fakturPenjualan?->nama ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td>Untuk Pembayaran</td>
@@ -263,15 +326,13 @@
 
         <section class="terbilang">
             <strong>Terbilang:</strong>
-            <div>{{ $pembayaran->terbilang }}</div>
+            <div class="terbilang-text">{{ $pembayaran->terbilang }}</div>
         </section>
 
         <div class="signature">
             <div>Diterima / Diperiksa oleh,</div>
             <div class="signature-space"></div>
-            <div class="signature-line">
-                ( ____________________ )
-            </div>
+            <div class="signature-line">( ____________________ )</div>
         </div>
 
         <footer class="footer">

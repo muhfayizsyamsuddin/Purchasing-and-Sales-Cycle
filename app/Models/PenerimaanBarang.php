@@ -18,14 +18,14 @@ class PenerimaanBarang extends Model
 
     protected $fillable = [
         'no_penerimaan',
-        'tanggal_penerimaan',
+        'tanggal',
         'no_order_pembelian',
     ];
 
     protected function casts(): array
     {
         return [
-            'tanggal_penerimaan' => 'date',
+            'tanggal' => 'date',
         ];
     }
 

@@ -8,3 +8,4 @@ import 'gentelella';
 
 // Your overrides, loaded after the design system so they win.
 import '../css/gentelella.scss';
+import '../css/barang.css';

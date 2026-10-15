@@ -1,0 +1,48 @@
+
+/* Perapian halaman Master Barang */
+.barang-page .card {
+    overflow: hidden;
+}
+
+.barang-page .card-body {
+    padding-top: 16px;
+}
+
+.barang-page .table-responsive {
+    margin-top: 0;
+}
+
+.barang-page .dataTables_wrapper {
+    padding-top: 4px;
+}
+
+.barang-page .dataTables_filter {
+    margin-bottom: 12px;
+}
+
+.barang-page .dataTables_filter input {
+    min-width: 220px;
+}
+
+.barang-page .table th,
+.barang-page .table td {
+    vertical-align: middle;
+}
+
+.barang-page .barang-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+@media (max-width: 640px) {
+    .barang-page .dataTables_filter input {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .barang-page .barang-actions {
+        justify-content: flex-start;
+    }
+}

@@ -6,68 +6,116 @@
 @section('breadcrumb', 'Home > Master Data > Barang > Edit')
 
 @section('content')
-    <x-gentelella::page-header
-        title="Edit Barang"
-        pretitle="Master Data"
-    />
+    <div class="barang-form-page">
+        <x-gentelella::page-header
+            title="Edit Barang"
+            pretitle="Master Data"
+        />
 
-    <x-gentelella::card title="Form Edit Barang">
-        <form
-            action="{{ route('barang.update', $barang->sku) }}"
-            method="POST"
-        >
-            @csrf
-            @method('PUT')
+        <style>
+            .barang-form-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 20px;
+            }
 
-            <div class="form-group">
-                <label for="sku" class="form-label">
-                    SKU <span class="required">*</span>
-                </label>
+            .barang-form-grid .form-group {
+                min-width: 0;
+                margin-bottom: 0;
+            }
 
-                <input
-                    type="text"
-                    id="sku"
-                    name="sku"
-                    value="{{ old('sku', $barang->sku) }}"
-                    class="form-control @error('sku') is-invalid @enderror"
-                    maxlength="255"
-                    required
-                >
+            .barang-form-page .form-control {
+                width: 100%;
+                box-sizing: border-box;
+            }
 
-                @error('sku')
-                    <div class="form-error">{{ $message }}</div>
-                @enderror
-            </div>
+            .barang-form-actions {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                gap: 10px;
+                margin-top: 28px;
+                padding-top: 20px;
+                border-top: 1px solid var(--border-color);
+            }
 
-            <div class="form-group">
-                <label for="nama_barang" class="form-label">
-                    Nama Barang <span class="required">*</span>
-                </label>
+            @media (max-width: 700px) {
+                .barang-form-grid {
+                    grid-template-columns: minmax(0, 1fr);
+                    gap: 16px;
+                }
 
-                <input
-                    type="text"
-                    id="nama_barang"
-                    name="nama_barang"
-                    value="{{ old('nama_barang', $barang->nama_barang) }}"
-                    class="form-control @error('nama_barang') is-invalid @enderror"
-                    maxlength="255"
-                    required
-                >
+                .barang-form-actions {
+                    flex-wrap: wrap;
+                }
+            }
+        </style>
 
-                @error('nama_barang')
-                    <div class="form-error">{{ $message }}</div>
-                @enderror
-            </div>
+        <x-gentelella::card title="Informasi Barang">
+            <p style="color:var(--text-muted); font-size:13px; margin:0 0 24px;">
+                Perbarui SKU atau nama barang sesuai data yang diperlukan.
+                Kolom bertanda <span class="required">*</span> wajib diisi.
+            </p>
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                    Simpan Perubahan
-                </button>
+            <form
+                action="{{ route('barang.update', $barang->sku) }}"
+                method="POST"
+            >
+                @csrf
+                @method('PUT')
 
-                <a href="{{ route('barang.index') }}" class="btn btn-outline">
-                    Batal
-                </a>
-            </div>
-        </form>
-    </x-gentelella::card>
+                <div class="barang-form-grid">
+                    <div class="form-group">
+                        <label for="sku" class="form-label">
+                            SKU <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="sku"
+                            name="sku"
+                            value="{{ old('sku', $barang->sku) }}"
+                            class="form-control @error('sku') is-invalid @enderror"
+                            maxlength="255"
+                            required
+                        >
+
+                        @error('sku')
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nama_barang" class="form-label">
+                            Nama Barang <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nama_barang"
+                            name="nama_barang"
+                            value="{{ old('nama_barang', $barang->nama_barang) }}"
+                            class="form-control @error('nama_barang') is-invalid @enderror"
+                            maxlength="255"
+                            required
+                        >
+
+                        @error('nama_barang')
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="barang-form-actions">
+                    <a href="{{ route('barang.index') }}" class="btn btn-outline">
+                        Batal
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </x-gentelella::card>
+    </div>
 @endsection

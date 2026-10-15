@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -35,6 +36,7 @@
         }
 
         .button {
+            display: inline-block;
             border: 0;
             border-radius: 4px;
             padding: 9px 14px;
@@ -122,11 +124,12 @@
             width: 100%;
             margin-top: 10px;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         .detail-table th,
         .detail-table td {
-            padding: 9px 7px;
+            padding: 8px 6px;
             border: 1px solid #cbd5e1;
             text-align: left;
             vertical-align: top;
@@ -136,6 +139,8 @@
         .detail-table th {
             background: #f1f5f9;
             font-weight: 700;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         .text-right {
@@ -174,6 +179,11 @@
             padding: 10px;
             border: 1px solid #cbd5e1;
             border-radius: 3px;
+            overflow-wrap: anywhere;
+        }
+
+        .payment-note div {
+            margin-top: 4px;
         }
 
         .signatures {
@@ -191,6 +201,7 @@
         .signature-line {
             padding-top: 6px;
             border-top: 1px solid #475569;
+            overflow-wrap: anywhere;
         }
 
         .footer {
@@ -200,6 +211,42 @@
             color: #64748b;
             font-size: 10px;
             text-align: center;
+        }
+
+        @media screen and (max-width: 760px) {
+            .sheet {
+                width: calc(100% - 24px);
+                min-height: 0;
+                margin: 0 12px 24px;
+                padding: 24px;
+            }
+
+            .toolbar {
+                width: calc(100% - 24px);
+            }
+
+            .information-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .document-header {
+                gap: 12px;
+            }
+
+            .company-name {
+                font-size: 15px;
+            }
+
+            .document-title {
+                font-size: 17px;
+            }
+
+            .detail-table th,
+            .detail-table td {
+                padding: 5px 4px;
+                font-size: 10px;
+            }
         }
 
         @media print {
@@ -226,11 +273,18 @@
                 page-break-inside: auto;
             }
 
+            .detail-table thead {
+                display: table-header-group;
+            }
+
             .detail-table tr {
+                break-inside: avoid;
                 page-break-inside: avoid;
             }
 
+            .payment-note,
             .signatures {
+                break-inside: avoid;
                 page-break-inside: avoid;
             }
         }
@@ -306,7 +360,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>Jangka Waktu Pembayaran</td>
+                        <td>Jangka Pembayaran</td>
                         <td>{{ $faktur->jangka_waktu_pembayaran }}</td>
                     </tr>
                 </table>
@@ -319,12 +373,12 @@
             <table class="detail-table">
                 <thead>
                     <tr>
-                        <th>SKU</th>
-                        <th>Nama Barang</th>
-                        <th>Kuantitas</th>
-                        <th>Harga Unit</th>
-                        <th>Diskon</th>
-                        <th>Total Harga</th>
+                        <th style="width: 15%">SKU</th>
+                        <th style="width: 25%">Nama Barang</th>
+                        <th class="text-right" style="width: 12%">Kuantitas</th>
+                        <th class="text-right" style="width: 16%">Harga Unit</th>
+                        <th class="text-right" style="width: 14%">Diskon</th>
+                        <th class="text-right" style="width: 18%">Total Harga</th>
                     </tr>
                 </thead>
 
@@ -333,8 +387,8 @@
                         <tr>
                             <td>{{ $detail->sku }}</td>
                             <td>{{ $detail->barang?->nama_barang ?? '-' }}</td>
-                            <td class="text-center">
-                                {{ $detail->kuantitas }}
+                            <td class="text-right">
+                                {{ number_format($detail->kuantitas, 0, ',', '.') }}
                             </td>
                             <td class="text-right">
                                 {{ number_format((float) $detail->harga_unit, 2, ',', '.') }}
@@ -360,19 +414,19 @@
                 <tr>
                     <td>Jumlah</td>
                     <td>
-                        {{ number_format((float) $faktur->jumlah, 2, ',', '.') }}
+                        Rp {{ number_format((float) $faktur->jumlah, 2, ',', '.') }}
                     </td>
                 </tr>
                 <tr>
                     <td>PPN</td>
                     <td>
-                        {{ number_format((float) $faktur->ppn, 2, ',', '.') }}
+                        Rp {{ number_format((float) $faktur->ppn, 2, ',', '.') }}
                     </td>
                 </tr>
                 <tr class="grand-total">
                     <td>Total Harga</td>
                     <td>
-                        {{ number_format((float) $faktur->total_harga, 2, ',', '.') }}
+                        Rp {{ number_format((float) $faktur->total_harga, 2, ',', '.') }}
                     </td>
                 </tr>
             </table>
@@ -394,9 +448,7 @@
             <div>
                 <div>Pembeli</div>
                 <div class="signature-space"></div>
-                <div class="signature-line">
-                    {{ $faktur->nama }}
-                </div>
+                <div class="signature-line">{{ $faktur->nama }}</div>
             </div>
 
             <div>
@@ -408,9 +460,9 @@
             </div>
         </div>
 
-        <div class="footer">
+        <footer class="footer">
             Dokumen Faktur Penjualan — {{ $faktur->no_faktur }}
-        </div>
+        </footer>
     </main>
 </body>
 </html>

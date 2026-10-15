@@ -20,13 +20,13 @@ return [
     |
     */
 
-    'title' => 'Gentelella',
+    'title' => 'Purchasing & Sales Cycle',
     'title_prefix' => '',
     'title_postfix' => '',
 
-    'brand_name' => 'Gentelella',
-    'brand_suffix' => 'v4',
-    'brand_initial' => 'G',
+    'brand_name' => 'Purchasing & Sales Cycle',
+    'brand_suffix' => '',
+    'brand_initial' => '',
 
     /*
     |--------------------------------------------------------------------------
@@ -60,7 +60,7 @@ return [
     */
 
     'user' => [
-        'enabled' => true,
+        'enabled' => false,
         'name_field' => 'name',
         'role_field' => 'role',
         'fallback_name' => 'Guest',
@@ -207,6 +207,25 @@ return [
                 ],
             ],
         ],
+        [
+            'label' => 'Admin',
+            'items' => [
+                [
+                    'key' => 'users',
+                    'text' => 'User Management',
+                    'icon' => 'users',
+                    'route' => 'users.index',
+                    'can' => 'users.view',
+                ],
+                [
+                    'key' => 'roles',
+                    'text' => 'Role & Permission',
+                    'icon' => 'settings',
+                    'route' => 'roles.index',
+                    'can' => 'roles.manage',
+                ],
+            ],
+        ],
     ],
 
     /*
@@ -237,7 +256,7 @@ return [
     // The Laravel edition's own documentation, not the HTML edition's — the
     // two cover different things, and a Blade developer sent to the static
     // template's docs finds nothing about panels, fields or filters.
-    'docs_url' => 'https://gentelella.colorlib.com/docs/laravel/',
+    'docs_url' => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -261,10 +280,10 @@ return [
         'lock' => null,
         'logout' => 'logout',
     ],
-    'search_enabled' => true,
+    'search_enabled' => false,
     'theme_toggle' => true,
-    'notifications_enabled' => true,
-    'messages_enabled' => true,
+    'notifications_enabled' => false,
+    'messages_enabled' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -272,7 +291,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'footer_left' => 'Gentelella — free admin dashboard template by <a href="https://colorlib.com">Colorlib</a>',
+    'footer_left' => 'Purchasing & Sales Cycle',
     'footer_right' => null,
 
     /*

@@ -8,7 +8,7 @@
 
     <style>
         @page {
-            size: A4 portrait;
+            size: A4;
             margin: 15mm;
         }
 
@@ -18,124 +18,144 @@
 
         body {
             margin: 0;
-            background: #f0f2f5;
-            color: #111;
-            font-family: Arial, sans-serif;
+            color: #222;
+            background: #f1f5f9;
+            font-family: Arial, Helvetica, sans-serif;
             font-size: 12px;
+            line-height: 1.5;
         }
 
         .toolbar {
-            max-width: 210mm;
-            margin: 16px auto;
+            width: 210mm;
+            max-width: 100%;
+            margin: 20px auto 12px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .button {
+            border: 0;
+            border-radius: 4px;
+            padding: 9px 14px;
+            color: #fff;
+            background: #159b83;
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .button-secondary {
+            background: #475569;
+        }
+
+        .sheet {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto 24px;
+            padding: 15mm;
+            background: #fff;
+            box-shadow: 0 2px 12px rgb(0 0 0 / 10%);
+        }
+
+        .document-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #159b83;
+        }
+
+        .company-name {
+            margin: 0 0 5px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .document-title {
+            margin: 0 0 4px;
+            font-size: 22px;
             text-align: right;
         }
 
-        .toolbar button,
-        .toolbar a {
-            display: inline-block;
-            padding: 9px 14px;
-            border: 1px solid #bbb;
-            border-radius: 4px;
-            background: #fff;
-            color: #111;
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 12px;
+        .muted {
+            color: #64748b;
         }
 
-        .paper {
-            width: 210mm;
-            min-height: 297mm;
-            margin: 0 auto 20px;
-            padding: 15mm;
-            background: #fff;
-            box-shadow: 0 2px 10px #0001;
+        .section-title {
+            margin: 22px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #cbd5e1;
+            font-size: 13px;
+            font-weight: 700;
         }
 
-        h1 {
-            margin: 0 0 5px;
-            text-align: center;
-            font-size: 20px;
-            text-transform: uppercase;
+        .information-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
         }
 
-        .subtitle {
-            margin-bottom: 28px;
-            text-align: center;
-            color: #444;
-        }
-
-        .metadata {
+        .information-table {
             width: 100%;
-            margin-bottom: 20px;
             border-collapse: collapse;
         }
 
-        .metadata td {
-            padding: 5px 4px;
+        .information-table td {
+            padding: 4px 0;
             vertical-align: top;
+            overflow-wrap: anywhere;
         }
 
-        .metadata td:first-child {
-            width: 155px;
+        .information-table td:first-child {
+            width: 42%;
+            color: #64748b;
         }
 
-        .metadata td:nth-child(2) {
-            width: 15px;
+        .information-table td:nth-child(2) {
+            padding-left: 8px;
+            font-weight: 600;
         }
 
-        .details {
+        .detail-table {
             width: 100%;
+            margin-top: 10px;
             border-collapse: collapse;
             table-layout: fixed;
         }
 
-        .details th,
-        .details td {
-            border: 1px solid #333;
-            padding: 7px 6px;
+        .detail-table th,
+        .detail-table td {
+            padding: 9px 7px;
+            border: 1px solid #cbd5e1;
+            text-align: left;
+            vertical-align: top;
             overflow-wrap: anywhere;
         }
 
-        .details th {
-            text-align: center;
-            font-weight: bold;
+        .detail-table th {
+            background: #f1f5f9;
+            font-weight: 700;
         }
 
-        .details th:nth-child(1) {
-            width: 17%;
+        .text-right {
+            text-align: right !important;
+            white-space: nowrap;
         }
 
-        .details th:nth-child(2) {
-            width: 33%;
-        }
-
-        .details th:nth-child(3) {
-            width: 15%;
-        }
-
-        .details th:nth-child(4) {
-            width: 35%;
-        }
-
-        .quantity {
-            text-align: center;
-        }
-
-        .blank-row td {
-            height: 28px;
+        .text-center {
+            text-align: center !important;
         }
 
         .signatures {
-            display: flex;
-            justify-content: space-between;
-            gap: 40px;
-            margin-top: 55px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-top: 48px;
             text-align: center;
-        }
-
-        .signature {
-            width: 42%;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
 
         .signature-space {
@@ -144,25 +164,61 @@
 
         .signature-line {
             padding-top: 6px;
-            border-top: 1px solid #555;
+            border-top: 1px solid #475569;
         }
 
-        @media screen {
-            .paper {
-                min-height: 297mm;
+        .footer {
+            margin-top: 30px;
+            padding-top: 8px;
+            border-top: 1px solid #cbd5e1;
+            color: #64748b;
+            font-size: 10px;
+            text-align: center;
+        }
+
+        @media screen and (max-width: 760px) {
+            .sheet {
+                width: calc(100% - 24px);
+                min-height: 0;
+                margin: 0 12px 24px;
+                padding: 24px;
+            }
+
+            .toolbar {
+                width: calc(100% - 24px);
+            }
+
+            .information-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .document-header {
+                gap: 12px;
+            }
+
+            .company-name {
+                font-size: 15px;
+            }
+
+            .document-title {
+                font-size: 17px;
             }
         }
 
         @media print {
             body {
                 background: #fff;
+                font-size: 11px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
 
             .toolbar {
                 display: none !important;
             }
 
-            .paper {
+            .sheet {
                 width: auto;
                 min-height: 0;
                 margin: 0;
@@ -170,12 +226,26 @@
                 box-shadow: none;
             }
 
-            .details thead {
+            .detail-table {
+                page-break-inside: auto;
+            }
+
+            .detail-table tr {
+                page-break-inside: avoid;
+            }
+
+            .detail-table thead {
                 display: table-header-group;
             }
 
-            tr {
-                break-inside: avoid;
+            .signatures {
+                page-break-inside: avoid;
+            }
+
+            .detail-table th {
+                background: #f1f5f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
         }
     </style>
@@ -183,80 +253,114 @@
 
 <body>
     <div class="toolbar">
-        <a href="{{ route('permintaan-pembelian.index') }}">Kembali</a>
-        <button type="button" onclick="window.print()">Cetak / Simpan PDF</button>
+        <a
+            href="{{ route('permintaan-pembelian.index') }}"
+            class="button button-secondary"
+        >
+            Kembali
+        </a>
+
+        <button
+            type="button"
+            class="button"
+            onclick="window.print()"
+        >
+            Cetak Permintaan
+        </button>
     </div>
 
-    <main class="paper">
-        <h1>Permintaan Pembelian</h1>
-        <div class="subtitle">Purchasing Cycle</div>
+    <main class="sheet">
+        <header class="document-header">
+            <div>
+                <h1 class="company-name">Purchasing &amp; Sales Cycle</h1>
+                <div class="muted">Dokumen Transaksi Pembelian</div>
+            </div>
 
-        <table class="metadata">
-            <tr>
-                <td>No. Faktur</td>
-                <td>:</td>
-                <td>{{ $permintaan->no_faktur }}</td>
-            </tr>
-            <tr>
-                <td>Tanggal</td>
-                <td>:</td>
-                <td>{{ \Illuminate\Support\Carbon::parse($permintaan->tanggal)->format('d/m/Y') }}</td>
-            </tr>
-            <tr>
-                <td>Tanggal Diperlukan</td>
-                <td>:</td>
-                <td>{{ \Illuminate\Support\Carbon::parse($permintaan->tanggal_diperlukan)->format('d/m/Y') }}</td>
-            </tr>
-        </table>
+            <div>
+                <h2 class="document-title">PERMINTAAN PEMBELIAN</h2>
+                <div class="text-right">
+                    No. Faktur:
+                    <strong>{{ $permintaan->no_faktur }}</strong>
+                </div>
+            </div>
+        </header>
 
-        <table class="details">
-            <thead>
-                <tr>
-                    <th>SKU</th>
-                    <th>Nama Barang</th>
-                    <th>Kuantitas</th>
-                    <th>Keterangan</th>
-                </tr>
-            </thead>
+        <section>
+            <h3 class="section-title">Informasi Permintaan</h3>
 
-            <tbody>
-                @forelse ($permintaan->details as $detail)
+            <div class="information-grid">
+                <table class="information-table">
                     <tr>
-                        <td>{{ $detail->sku }}</td>
-                        <td>{{ $detail->barang?->nama_barang ?? '-' }}</td>
-                        <td class="quantity">{{ $detail->kuantitas }}</td>
-                        <td>{{ $detail->keterangan }}</td>
+                        <td>Tanggal Permintaan</td>
+                        <td>
+                            {{ \Illuminate\Support\Carbon::parse($permintaan->tanggal)->format('d/m/Y') }}
+                        </td>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="4">Belum ada detail barang.</td>
-                    </tr>
-                @endforelse
+                </table>
 
-                @for ($i = 0; $i < max(0, 10 - $permintaan->details->count()); $i++)
-                    <tr class="blank-row">
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
+                <table class="information-table">
+                    <tr>
+                        <td>Tanggal Diperlukan</td>
+                        <td>
+                            {{ \Illuminate\Support\Carbon::parse($permintaan->tanggal_diperlukan)->format('d/m/Y') }}
+                        </td>
                     </tr>
-                @endfor
-            </tbody>
-        </table>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h3 class="section-title">Rincian Barang</h3>
+
+            <table class="detail-table">
+                <thead>
+                    <tr>
+                        <th style="width: 18%">SKU</th>
+                        <th style="width: 32%">Nama Barang</th>
+                        <th class="text-center" style="width: 15%">Kuantitas</th>
+                        <th style="width: 35%">Keterangan</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @forelse ($permintaan->details as $detail)
+                        <tr>
+                            <td>{{ $detail->sku }}</td>
+                            <td>{{ $detail->barang?->nama_barang ?? '-' }}</td>
+                            <td class="text-center">
+                                {{ number_format($detail->kuantitas, 0, ',', '.') }}
+                            </td>
+                            <td>{{ $detail->keterangan }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                Belum ada detail barang.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </section>
 
         <div class="signatures">
-            <div class="signature">
-                <div>Tanda tangan</div>
+            <div>
+                <div>Dibuat oleh,</div>
                 <div class="signature-space"></div>
-                <div class="signature-line">Pemohon</div>
+                <div class="signature-line">( ____________________ )</div>
             </div>
 
-            <div class="signature">
-                <div>Tanda tangan</div>
+            <div>
+                <div>Diperiksa / Disetujui oleh,</div>
                 <div class="signature-space"></div>
-                <div class="signature-line">Menyetujui</div>
+                <div class="signature-line">( ____________________ )</div>
             </div>
         </div>
+
+        <footer class="footer">
+            Dicetak dari sistem Purchasing &amp; Sales Cycle
+            pada {{ now()->format('d/m/Y H:i') }}.
+        </footer>
     </main>
 </body>
 </html>

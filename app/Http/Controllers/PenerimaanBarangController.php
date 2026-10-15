@@ -16,7 +16,7 @@ class PenerimaanBarangController extends Controller
     {
         $penerimaans = PenerimaanBarang::with('pesanan.vendor')
             ->withCount('details')
-            ->orderByDesc('tanggal_penerimaan')
+            ->orderByDesc('tanggal')
             ->paginate(10);
 
         return view(
@@ -52,7 +52,7 @@ class PenerimaanBarangController extends Controller
             DB::transaction(function () use ($validated) {
                 $penerimaan = PenerimaanBarang::create([
                     'no_penerimaan' => $validated['no_penerimaan'],
-                    'tanggal_penerimaan' => $validated['tanggal_penerimaan'],
+                    'tanggal' => $validated['tanggal'],
                     'no_order_pembelian' => $validated['no_order_pembelian'],
                 ]);
 
@@ -126,7 +126,7 @@ class PenerimaanBarangController extends Controller
             DB::transaction(function () use ($penerimaan, $validated) {
                 $penerimaan->update([
                     'no_penerimaan' => $validated['no_penerimaan'],
-                    'tanggal_penerimaan' => $validated['tanggal_penerimaan'],
+                    'tanggal' => $validated['tanggal'],
                     'no_order_pembelian' => $validated['no_order_pembelian'],
                 ]);
 
@@ -205,7 +205,7 @@ class PenerimaanBarangController extends Controller
                 'max:255',
                 $uniqueNoPenerimaan,
             ],
-            'tanggal_penerimaan' => [
+            'tanggal' => [
                 'required',
                 'date',
             ],

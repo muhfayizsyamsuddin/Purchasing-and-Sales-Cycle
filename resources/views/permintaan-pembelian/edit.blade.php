@@ -1,3 +1,4 @@
+
 @extends('gentelella::page')
 
 @section('title', 'Edit Permintaan Pembelian')
@@ -5,185 +6,301 @@
 @section('breadcrumb', 'Home > Transaksi > Permintaan Pembelian > Edit')
 
 @section('content')
-    <x-gentelella::page-header
-        title="Edit Permintaan Pembelian"
-        pretitle="Purchasing Cycle"
-    />
+    <div class="permintaan-form-page">
+        <x-gentelella::page-header
+            title="Edit Permintaan Pembelian"
+            pretitle="Purchasing Cycle"
+        />
 
-    <x-gentelella::card title="Informasi Permintaan">
-        @if ($errors->any())
-            <div class="banner banner-danger" role="alert">
-                <strong>Periksa kembali input berikut:</strong>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        <style>
+            .permintaan-form-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 20px;
+            }
 
-        @php
-            $details = old(
-                'details',
-                $permintaan->details->map(fn ($detail) => [
-                    'sku' => $detail->sku,
-                    'kuantitas' => $detail->kuantitas,
-                    'keterangan' => $detail->keterangan,
-                ])->all()
-            );
-        @endphp
+            .permintaan-form-grid .form-group {
+                min-width: 0;
+                margin-bottom: 0;
+            }
 
-        <form
-            action="{{ route('permintaan-pembelian.update', $permintaan->no_faktur) }}"
-            method="POST"
-        >
-            @csrf
-            @method('PUT')
+            .permintaan-form-page .form-control {
+                width: 100%;
+                box-sizing: border-box;
+            }
 
-            <div class="form-group">
-                <label for="no_faktur" class="form-label">
-                    No. Faktur <span class="required">*</span>
-                </label>
+            .permintaan-detail-section {
+                margin-top: 28px;
+                padding-top: 24px;
+                border-top: 1px solid var(--border-color);
+            }
 
-                <input
-                    type="text"
-                    id="no_faktur"
-                    name="no_faktur"
-                    value="{{ old('no_faktur', $permintaan->no_faktur) }}"
-                    class="form-control @error('no_faktur') is-invalid @enderror"
-                    maxlength="255"
-                    required
-                >
+            .permintaan-detail-heading {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 16px;
+                flex-wrap: wrap;
+                margin-bottom: 16px;
+            }
 
-                @error('no_faktur')
-                    <div class="form-error">{{ $message }}</div>
-                @enderror
-            </div>
+            .permintaan-detail-heading h3 {
+                margin: 0 0 4px;
+                font-size: 17px;
+                font-weight: 600;
+            }
 
-            <div class="form-group">
-                <label for="tanggal" class="form-label">
-                    Tanggal Permintaan <span class="required">*</span>
-                </label>
+            .permintaan-detail-table {
+                width: 100%;
+                min-width: 680px;
+                table-layout: fixed;
+            }
 
-                <input
-                    type="date"
-                    id="tanggal"
-                    name="tanggal"
-                    value="{{ old('tanggal', date('Y-m-d', strtotime($permintaan->tanggal))) }}"
-                    class="form-control"
-                    required
-                >
-            </div>
+            .permintaan-detail-table th,
+            .permintaan-detail-table td {
+                padding: 12px;
+                vertical-align: middle;
+            }
 
-            <div class="form-group">
-                <label for="tanggal_diperlukan" class="form-label">
-                    Tanggal Diperlukan <span class="required">*</span>
-                </label>
+            .permintaan-detail-table th {
+                text-align: center;
+            }
 
-                <input
-                    type="date"
-                    id="tanggal_diperlukan"
-                    name="tanggal_diperlukan"
-                    value="{{ old('tanggal_diperlukan', date('Y-m-d', strtotime($permintaan->tanggal_diperlukan))) }}"
-                    class="form-control"
-                    required
-                >
-            </div>
+            .permintaan-detail-table th:nth-child(1) {
+                width: 42%;
+            }
 
-            <hr>
+            .permintaan-detail-table th:nth-child(2) {
+                width: 16%;
+            }
 
-            <h3>Detail Barang</h3>
+            .permintaan-detail-table th:nth-child(3) {
+                width: 27%;
+            }
 
-            <div style="overflow-x: auto">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>SKU / Barang</th>
-                            <th>Kuantitas</th>
-                            <th>Keterangan</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
+            .permintaan-detail-table th:nth-child(4) {
+                width: 15%;
+            }
 
-                    <tbody id="detail-rows">
-                        @foreach ($details as $index => $detail)
-                            <tr data-detail-row>
-                                <td>
-                                    <select
-                                        name="details[{{ $index }}][sku]"
-                                        class="form-control"
-                                        required
-                                    >
-                                        <option value="">Pilih barang</option>
+            .permintaan-form-actions {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                gap: 10px;
+                margin-top: 28px;
+                padding-top: 20px;
+                border-top: 1px solid var(--border-color);
+            }
 
-                                        @foreach ($barangs as $barang)
-                                            <option
-                                                value="{{ $barang->sku }}"
-                                                @selected(($detail['sku'] ?? '') === $barang->sku)
-                                            >
-                                                {{ $barang->sku }} — {{ $barang->nama_barang }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </td>
+            @media (max-width: 700px) {
+                .permintaan-form-grid {
+                    grid-template-columns: minmax(0, 1fr);
+                    gap: 16px;
+                }
 
-                                <td>
-                                    <input
-                                        type="number"
-                                        name="details[{{ $index }}][kuantitas]"
-                                        class="form-control"
-                                        min="1"
-                                        value="{{ $detail['kuantitas'] ?? 1 }}"
-                                        required
-                                    >
-                                </td>
+                .permintaan-form-actions {
+                    flex-wrap: wrap;
+                }
+            }
+        </style>
 
-                                <td>
-                                    <input
-                                        type="text"
-                                        name="details[{{ $index }}][keterangan]"
-                                        class="form-control"
-                                        value="{{ $detail['keterangan'] ?? '' }}"
-                                    >
-                                </td>
+        <x-gentelella::card title="Informasi Permintaan">
+            <p style="color:var(--text-muted); font-size:13px; margin:0 0 24px;">
+                Perbarui informasi permintaan dan detail barang yang dibutuhkan.
+                Kolom bertanda <span class="required">*</span> wajib diisi.
+            </p>
 
-                                <td>
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-outline"
-                                        data-remove-row
-                                    >
-                                        Hapus Baris
-                                    </button>
-                                </td>
-                            </tr>
+            @if ($errors->any())
+                <div class="banner banner-danger" role="alert" style="margin-bottom:24px;">
+                    <strong>Periksa kembali input berikut:</strong>
+                    <ul style="margin:8px 0 0; padding-left:20px;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
+                    </ul>
+                </div>
+            @endif
 
-            <button
-                type="button"
-                id="add-detail"
-                class="btn btn-outline"
+            @php
+                $details = old(
+                    'details',
+                    $permintaan->details->map(fn ($detail) => [
+                        'sku' => $detail->sku,
+                        'kuantitas' => $detail->kuantitas,
+                        'keterangan' => $detail->keterangan,
+                    ])->all()
+                );
+            @endphp
+
+            <form
+                action="{{ route('permintaan-pembelian.update', $permintaan->no_faktur) }}"
+                method="POST"
             >
-                Tambah Baris Barang
-            </button>
+                @csrf
+                @method('PUT')
 
-            <div class="form-actions" style="margin-top: 20px">
-                <button type="submit" class="btn btn-primary">
-                    Simpan Perubahan
-                </button>
+                <div class="permintaan-form-grid">
+                    <div class="form-group">
+                        <label for="no_faktur" class="form-label">
+                            No. Faktur <span class="required">*</span>
+                        </label>
 
-                <a
-                    href="{{ route('permintaan-pembelian.index') }}"
-                    class="btn btn-outline"
-                >
-                    Batal
-                </a>
-            </div>
-        </form>
-    </x-gentelella::card>
+                        <input
+                            type="text"
+                            id="no_faktur"
+                            name="no_faktur"
+                            value="{{ old('no_faktur', $permintaan->no_faktur) }}"
+                            class="form-control @error('no_faktur') is-invalid @enderror"
+                            maxlength="255"
+                            required
+                        >
+
+                        @error('no_faktur')
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tanggal" class="form-label">
+                            Tanggal Permintaan <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            id="tanggal"
+                            name="tanggal"
+                            value="{{ old('tanggal', date('Y-m-d', strtotime($permintaan->tanggal))) }}"
+                            class="form-control @error('tanggal') is-invalid @enderror"
+                            required
+                        >
+
+                        @error('tanggal')
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tanggal_diperlukan" class="form-label">
+                            Tanggal Diperlukan <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            id="tanggal_diperlukan"
+                            name="tanggal_diperlukan"
+                            value="{{ old('tanggal_diperlukan', date('Y-m-d', strtotime($permintaan->tanggal_diperlukan))) }}"
+                            class="form-control @error('tanggal_diperlukan') is-invalid @enderror"
+                            required
+                        >
+
+                        @error('tanggal_diperlukan')
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="permintaan-detail-section">
+                    <div class="permintaan-detail-heading">
+                        <div>
+                            <h3>Detail Barang</h3>
+                            <p style="color:var(--text-muted); font-size:13px; margin:0;">
+                                Perbarui pilihan barang, kuantitas, atau keterangan.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            id="add-detail"
+                            class="btn btn-outline"
+                        >
+                            + Tambah Baris Barang
+                        </button>
+                    </div>
+
+                    <div style="overflow-x:auto;">
+                        <table class="table permintaan-detail-table">
+                            <thead>
+                                <tr>
+                                    <th>SKU / Barang</th>
+                                    <th>Kuantitas</th>
+                                    <th>Keterangan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="detail-rows">
+                                @foreach ($details as $index => $detail)
+                                    <tr data-detail-row>
+                                        <td>
+                                            <select
+                                                name="details[{{ $index }}][sku]"
+                                                class="form-control"
+                                                required
+                                            >
+                                                <option value="">Pilih barang</option>
+
+                                                @foreach ($barangs as $barang)
+                                                    <option
+                                                        value="{{ $barang->sku }}"
+                                                        @selected(($detail['sku'] ?? '') === $barang->sku)
+                                                    >
+                                                        {{ $barang->sku }} — {{ $barang->nama_barang }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+
+                                        <td>
+                                            <input
+                                                type="number"
+                                                name="details[{{ $index }}][kuantitas]"
+                                                class="form-control"
+                                                min="1"
+                                                value="{{ $detail['kuantitas'] ?? 1 }}"
+                                                required
+                                            >
+                                        </td>
+
+                                        <td>
+                                            <input
+                                                type="text"
+                                                name="details[{{ $index }}][keterangan]"
+                                                class="form-control"
+                                                value="{{ $detail['keterangan'] ?? '' }}"
+                                            >
+                                        </td>
+
+                                        <td style="text-align:center;">
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline"
+                                                data-remove-row
+                                            >
+                                                Hapus
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="permintaan-form-actions">
+                    <a
+                        href="{{ route('permintaan-pembelian.index') }}"
+                        class="btn btn-outline"
+                    >
+                        Batal
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </x-gentelella::card>
+    </div>
 
     <template id="detail-row-template">
         <tr data-detail-row>
@@ -222,13 +339,13 @@
                 >
             </td>
 
-            <td>
+            <td style="text-align:center;">
                 <button
                     type="button"
                     class="btn btn-sm btn-outline"
                     data-remove-row
                 >
-                    Hapus Baris
+                    Hapus
                 </button>
             </td>
         </tr>
@@ -240,7 +357,19 @@
             const template = document.getElementById('detail-row-template');
             const addButton = document.getElementById('add-detail');
 
-            let nextIndex = container.querySelectorAll('[data-detail-row]').length;
+            if (!container || !template || !addButton) {
+                return;
+            }
+
+            let nextIndex = Math.max(
+                -1,
+                ...Array.from(container.querySelectorAll('[data-detail-row]'))
+                    .map((row) => {
+                        const input = row.querySelector('[name*="[sku]"]');
+                        const match = input?.name.match(/details\[(\d+)\]/);
+                        return match ? Number(match[1]) : -1;
+                    })
+            ) + 1;
 
             addButton.addEventListener('click', () => {
                 const html = template.innerHTML.replaceAll(
@@ -251,7 +380,11 @@
                 const temporaryBody = document.createElement('tbody');
                 temporaryBody.innerHTML = html.trim();
 
-                container.appendChild(temporaryBody.firstElementChild);
+                const newRow = temporaryBody.firstElementChild;
+
+                if (newRow) {
+                    container.appendChild(newRow);
+                }
             });
 
             container.addEventListener('click', (event) => {
