@@ -17,7 +17,7 @@ class ReturPembelianController extends Controller
         $returs = ReturPembelian::with([
             'penerimaan.pesanan.vendor',
         ])
-            ->withCount('details')
+            ->withSum('details', 'jumlah')
             ->orderByDesc('tanggal')
             ->paginate(10);
 

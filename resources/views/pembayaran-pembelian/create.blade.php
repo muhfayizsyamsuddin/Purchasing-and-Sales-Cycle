@@ -79,15 +79,17 @@
         .pembayaran-pembelian-form-page .tagihan-summary {
             margin: 22px 0;
             padding: 20px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #334155;
             border-radius: 6px;
-            background: #f8fafc;
+            background: #1b2534;
+            color: #f8fafc;
         }
 
         .pembayaran-pembelian-form-page .tagihan-summary h4 {
             margin: 0 0 18px;
             font-size: 16px;
             font-weight: 600;
+            color: #f8fafc;
         }
 
         .pembayaran-pembelian-form-page .summary-grid {
@@ -102,19 +104,20 @@
 
         .pembayaran-pembelian-form-page .summary-label {
             margin-bottom: 6px;
-            color: #64748b;
+            color: #cbd5e1;
             font-size: 13px;
         }
 
         .pembayaran-pembelian-form-page .summary-value {
             overflow-wrap: anywhere;
+            color: #ffffff;
             font-size: 17px;
             font-weight: 600;
         }
 
         .pembayaran-pembelian-form-page .summary-help {
             margin: 16px 0 0;
-            color: #64748b;
+            color: #cbd5e1;
             font-size: 13px;
         }
 
@@ -377,6 +380,91 @@
                         }).format(value);
                     }
 
+                    const terbilangInput = document.getElementById('terbilang');
+
+                    function terbilangBilangan(n) {
+                        const angka = [
+                            'nol', 'satu', 'dua', 'tiga', 'empat', 'lima',
+                            'enam', 'tujuh', 'delapan', 'sembilan', 'sepuluh',
+                            'sebelas'
+                        ];
+
+                        if (n < 12) {
+                            return angka[n];
+                        }
+
+                        if (n < 20) {
+                            return `${terbilangBilangan(n - 10)} belas`;
+                        }
+
+                        if (n < 100) {
+                            return `${terbilangBilangan(Math.floor(n / 10))} puluh${
+                                n % 10 ? ' ' + terbilangBilangan(n % 10) : ''
+                            }`;
+                        }
+
+                        if (n < 200) {
+                            return `seratus${
+                                n > 100 ? ' ' + terbilangBilangan(n - 100) : ''
+                            }`;
+                        }
+
+                        if (n < 1000) {
+                            return `${terbilangBilangan(Math.floor(n / 100))} ratus${
+                                n % 100 ? ' ' + terbilangBilangan(n % 100) : ''
+                            }`;
+                        }
+
+                        if (n < 2000) {
+                            return `seribu${
+                                n > 1000 ? ' ' + terbilangBilangan(n - 1000) : ''
+                            }`;
+                        }
+
+                        if (n < 1_000_000) {
+                            return `${terbilangBilangan(Math.floor(n / 1000))} ribu${
+                                n % 1000 ? ' ' + terbilangBilangan(n % 1000) : ''
+                            }`;
+                        }
+
+                        if (n < 1_000_000_000) {
+                            return `${terbilangBilangan(Math.floor(n / 1_000_000))} juta${
+                                n % 1_000_000 ? ' ' + terbilangBilangan(n % 1_000_000) : ''
+                            }`;
+                        }
+
+                        if (n < 1_000_000_000_000) {
+                            return `${terbilangBilangan(Math.floor(n / 1_000_000_000))} miliar${
+                                n % 1_000_000_000
+                                    ? ' ' + terbilangBilangan(n % 1_000_000_000)
+                                    : ''
+                            }`;
+                        }
+
+                        return String(n);
+                    }
+
+                    function updateTerbilang() {
+                        const nilai = jumlahInput.value;
+
+                        if (nilai === '' || !Number.isFinite(Number(nilai)) || Number(nilai) <= 0) {
+                            terbilangInput.value = '';
+                            return;
+                        }
+
+                        const totalSen = Math.round(Number(nilai) * 100);
+                        const rupiah = Math.floor(totalSen / 100);
+                        const sen = totalSen % 100;
+
+                        let hasil = `${terbilangBilangan(rupiah)} rupiah`;
+
+                        if (sen > 0) {
+                            hasil += ` ${terbilangBilangan(sen)} sen`;
+                        }
+
+                        terbilangInput.value = hasil.charAt(0).toUpperCase() + hasil.slice(1);
+                    }
+
                     function updateTagihan() {
                         const selected = fakturOptions.find(
                             faktur => faktur.value === fakturSelect.value
@@ -386,6 +474,7 @@
                             summary.style.display = 'none';
                             jumlahInput.removeAttribute('max');
                             jumlahInput.setCustomValidity('');
+                            updateTerbilang();
                             return;
                         }
 
@@ -393,6 +482,10 @@
                         totalElement.textContent = formatRupiah(selected.total);
                         paidElement.textContent = formatRupiah(selected.terbayar);
                         remainingElement.textContent = formatRupiah(selected.sisa);
+
+                        if (jumlahInput.value === '' && selected.sisa > 0) {
+                            jumlahInput.value = selected.sisa.toFixed(2);
+                        }
 
                         jumlahInput.max = selected.sisa.toFixed(2);
 
@@ -411,10 +504,12 @@
                         if (!terimaDari.value.trim()) {
                             terimaDari.value = selected.nama;
                         }
+                        updateTerbilang();
                     }
 
                     fakturSelect.addEventListener('change', function () {
                         terimaDari.value = '';
+                        jumlahInput.value = '';
                         updateTagihan();
                     });
 
@@ -430,6 +525,7 @@
                         } else {
                             jumlahInput.setCustomValidity('');
                         }
+                        updateTerbilang();
                     });
 
                     updateTagihan();

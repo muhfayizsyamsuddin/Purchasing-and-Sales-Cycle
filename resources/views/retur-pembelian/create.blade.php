@@ -20,6 +20,9 @@
                     . ($penerimaan->pesanan?->no_order_pembelian ?? '-')
                     . ' — '
                     . ($penerimaan->pesanan?->vendor?->nama_vendor ?? '-'),
+                'vendor' => [
+                    'nama' => $penerimaan->pesanan?->vendor?->nama_vendor ?? '',
+                ],
                 'items' => $penerimaan->details
                     ->map(function ($detail) use ($pesananDetails, $returnedDetails) {
                         $sudahDiretur = $returnedDetails
@@ -36,6 +39,14 @@
                             $detail->sku
                         );
 
+                        $kuantitasPesanan = max(
+                            (int) ($pesananDetail?->kuantitas ?? 1),
+                            1
+                        );
+
+                        $diskonPerUnit = (float) ($pesananDetail?->diskon ?? 0)
+                            / $kuantitasPesanan;
+
                         return [
                             'sku' => $detail->sku,
                             'label' => $detail->sku
@@ -43,6 +54,7 @@
                                 . ($detail->barang?->nama_barang ?? 'Barang tidak ditemukan'),
                             'kuantitas' => $sisaRetur,
                             'harga_unit' => (float) ($pesananDetail?->harga_unit ?? 0),
+                            'diskon_per_unit' => $diskonPerUnit,
                         ];
                     })
                     ->filter(fn ($item) => $item['kuantitas'] > 0)
@@ -567,6 +579,7 @@
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const receiptSelect = document.getElementById('no_penerimaan');
+                        const namaPenjualInput = document.getElementById('nama_penjual');
                         const detailRows = document.getElementById('detail-rows');
                         const template = document.getElementById('detail-row-template');
                         const addButton = document.getElementById('add-detail');
@@ -579,6 +592,9 @@
                             const selectedReceipt = receiptOptions.find(
                                 receipt => String(receipt.value) === receiptSelect.value
                             );
+                            if (namaPenjualInput && selectedReceipt) {
+                                namaPenjualInput.value = selectedReceipt.vendor?.nama ?? '';
+                            }
 
                             const items = selectedReceipt ? selectedReceipt.items : [];
 
@@ -597,6 +613,7 @@
                                     option.value = String(item.sku);
                                     option.dataset.availableQuantity = String(item.kuantitas);
                                     option.dataset.unitPrice = String(item.harga_unit);
+                                    option.dataset.discountPerUnit = String(item.diskon_per_unit ?? 0);
 
                                     select.appendChild(option);
                                 });
@@ -648,6 +665,13 @@
 
                                 price.value = option.dataset.unitPrice;
                                 price.dataset.userEdited = '';
+                                const discount = row.querySelector('input[name$="[diskon]"]');
+
+                                if (discount) {
+                                    const diskonPerUnit = Number(option.dataset.discountPerUnit || 0);
+                                    discount.value = (diskonPerUnit * Number(quantity.value)).toFixed(2);
+                                    discount.dataset.userEdited = '';
+                                }
                             } else {
                                 quantity.removeAttribute('max');
                                 availableLabel.textContent = '-';
@@ -656,6 +680,24 @@
 
                         detailRows.addEventListener('input', function (event) {
                             if (event.target.matches('[data-price-input]')) {
+                                event.target.dataset.userEdited = 'true';
+                            }
+
+                            if (event.target.matches('[data-quantity-input]')) {
+                                const row = event.target.closest('[data-detail-row]');
+                                const option = row.querySelector('[data-sku-select]')?.selectedOptions[0];
+                                const discount = row.querySelector('input[name$="[diskon]"]');
+
+                                if (option?.value && discount?.dataset.userEdited !== 'true') {
+                                    const diskonPerUnit = Number(option.dataset.discountPerUnit || 0);
+
+                                    discount.value = (
+                                        diskonPerUnit * Number(event.target.value || 0)
+                                    ).toFixed(2);
+                                }
+                            }
+
+                            if (event.target.matches('input[name$="[diskon]"]')) {
                                 event.target.dataset.userEdited = 'true';
                             }
                         });
@@ -695,7 +737,17 @@
                             refreshSkuOptions();
                         });
 
-                        receiptSelect.addEventListener('change', refreshSkuOptions);
+                        receiptSelect.addEventListener('change', function () {
+                            const selectedReceipt = receiptOptions.find(
+                                receipt => String(receipt.value) === receiptSelect.value
+                            );
+
+                            if (namaPenjualInput) {
+                                namaPenjualInput.value = selectedReceipt?.vendor?.nama ?? '';
+                            }
+
+                            refreshSkuOptions();
+                        });
 
                         refreshSkuOptions();
                     });

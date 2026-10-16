@@ -82,7 +82,7 @@
                         <th>Jumlah</th>
                         <th>PPN</th>
                         <th>Total Harga</th>
-                        <th>Jumlah Detail</th>
+                        <th>Total Kuantitas</th>
                         <th data-orderable="false">Aksi</th>
                     </tr>
                 </thead>
@@ -104,7 +104,7 @@
                             <td>
                                 {{ number_format((float) $retur->total_harga, 2, ',', '.') }}
                             </td>
-                            <td>{{ $retur->details_count }}</td>
+                            <td>{{ $retur->details_sum_jumlah ?? 0 }}</td>
                             <td>
                                 @can('retur-pembelian.view')
                                     <a
