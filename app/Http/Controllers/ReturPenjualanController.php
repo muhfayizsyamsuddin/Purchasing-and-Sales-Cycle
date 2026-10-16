@@ -17,7 +17,7 @@ class ReturPenjualanController extends Controller
         $returs = ReturPenjualan::with([
             'pengirimanPesanan.pesananPenjualan',
         ])
-            ->withCount('details')
+            ->withSum('details', 'jumlah')
             ->orderByDesc('tanggal')
             ->paginate(10);
 
@@ -28,7 +28,27 @@ class ReturPenjualanController extends Controller
     {
         $pengirimans = $this->getPengirimans();
 
-        return view('retur-penjualan.create', compact('pengirimans'));
+        $prefix = 'RTJ-' . now()->format('Y') . '-';
+
+        $lastSequence = ReturPenjualan::query()
+            ->where('no_retur', 'like', $prefix . '%')
+            ->pluck('no_retur')
+            ->map(function ($number) use ($prefix) {
+                return preg_match(
+                    '/^' . preg_quote($prefix, '/') . '(\d+)$/',
+                    $number,
+                    $matches
+                ) ? (int) $matches[1] : 0;
+            })
+            ->max() ?? 0;
+
+        $nextNoRetur = $prefix
+            . str_pad((string) ($lastSequence + 1), 3, '0', STR_PAD_LEFT);
+
+        return view(
+            'retur-penjualan.create',
+            compact('pengirimans', 'nextNoRetur')
+        );
     }
 
     public function store(Request $request)
@@ -172,6 +192,7 @@ class ReturPenjualanController extends Controller
             'pesananPenjualan',
             'details.barang',
             'returPenjualan.details',
+            'fakturPenjualan.details',
         ])
             ->orderByDesc('tanggal')
             ->get();
@@ -270,8 +291,10 @@ class ReturPenjualanController extends Controller
         array $validated,
         ?ReturPenjualan $retur = null
     ): void {
-        $pengiriman = PengirimanPesanan::with('details')
-            ->findOrFail($validated['id_pengiriman_pesanan']);
+        $pengiriman = PengirimanPesanan::with([
+            'details',
+            'pesananPenjualan.details',
+        ])->findOrFail($validated['id_pengiriman_pesanan']);
 
         $barangDikirim = $pengiriman->details
             ->groupBy('sku')
@@ -287,6 +310,45 @@ class ReturPenjualanController extends Controller
                 throw ValidationException::withMessages([
                     "details.$index.sku" =>
                         'Barang tidak terdapat dalam pengiriman yang dipilih.',
+                ]);
+            }
+            $detailPesanan = $pengiriman->pesananPenjualan?->details
+                ->firstWhere('sku', $sku);
+
+            if ($detailPesanan === null) {
+                throw ValidationException::withMessages([
+                    "details.$index.sku" =>
+                        'Detail barang tidak ditemukan pada Pesanan Penjualan asal.',
+                ]);
+            }
+
+            // Harga unit harus sesuai dengan Pesanan Penjualan.
+            $hargaAsal = (float) $detailPesanan->harga_unit;
+
+            if (abs($hargaUnit - $hargaAsal) > 0.01) {
+                throw ValidationException::withMessages([
+                    "details.$index.harga_unit" =>
+                        'Harga unit retur harus sesuai dengan Pesanan Penjualan asal.',
+                ]);
+            }
+
+            // Diskon asal dibagi secara proporsional berdasarkan kuantitas.
+            $kuantitasPesanan = max(
+                (int) $detailPesanan->kuantitas,
+                1
+            );
+
+            $diskonAsal = (float) ($detailPesanan->diskon ?? 0);
+
+            $diskonSeharusnya = round(
+                ($diskonAsal / $kuantitasPesanan) * $kuantitasRetur,
+                2
+            );
+
+            if (abs($diskon - $diskonSeharusnya) > 0.01) {
+                throw ValidationException::withMessages([
+                    "details.$index.diskon" =>
+                        'Diskon retur harus sesuai dengan proporsi diskon Pesanan Penjualan asal.',
                 ]);
             }
 
@@ -345,7 +407,26 @@ class ReturPenjualanController extends Controller
         }
 
         $jumlah = round($jumlah, 2);
-        $ppn = round((float) $validated['ppn'], 2);
+
+        // Ambil PPN dari faktur penjualan yang terkait dengan pengiriman.
+        $pengiriman = PengirimanPesanan::with('fakturPenjualan')
+            ->findOrFail($validated['id_pengiriman_pesanan']);
+
+        $faktur = $pengiriman->fakturPenjualan;
+
+        $fakturJumlah = (float) ($faktur?->jumlah ?? 0);
+        $fakturPpn = (float) ($faktur?->ppn ?? 0);
+
+        if ($faktur !== null && $fakturJumlah > 0) {
+            $ppn = round(
+                ($jumlah / $fakturJumlah) * $fakturPpn,
+                2
+            );
+        } else {
+            // Pertahankan input manual jika tidak ada faktur asal
+            // atau subtotal faktur tidak dapat digunakan untuk prorata.
+            $ppn = round((float) ($validated['ppn'] ?? 0), 2);
+        }
 
         return [
             $jumlah,

@@ -342,8 +342,18 @@
                         <td>{{ $retur->tanggal->format('d/m/Y') }}</td>
                     </tr>
                     <tr>
-                        <td>ID Pengiriman</td>
-                        <td>{{ $retur->id_pengiriman_pesanan }}</td>
+                        <td>No. Pengiriman</td>
+                        <td>
+                            {{ $retur->pengirimanPesanan
+                                ? 'PG-' . \Carbon\Carbon::parse($retur->pengirimanPesanan->tanggal)->format('Y')
+                                    . '-' . str_pad(
+                                        (string) $retur->id_pengiriman_pesanan,
+                                        3,
+                                        '0',
+                                        STR_PAD_LEFT
+                                    )
+                                : '-' }}
+                        </td>
                     </tr>
                     <tr>
                         <td>No. Pesanan</td>

@@ -23,7 +23,17 @@
                     $barang = $rows->first()->barang;
                     $dikirim = (int) $rows->sum('total');
                     $sudahDiretur = (int) $returned->get($sku, 0);
-                    $harga = (float) ($prices->get($sku)?->harga_unit ?? 0);
+                    $orderDetail = $prices->get($sku);
+
+                    $harga = (float) ($orderDetail?->harga_unit ?? 0);
+
+                    $orderQuantity = max(
+                        (int) ($orderDetail?->kuantitas ?? 1),
+                        1
+                    );
+
+                    $diskonPerUnit = (float) ($orderDetail?->diskon ?? 0)
+                        / $orderQuantity;
 
                     return [
                         'sku' => $sku,
@@ -31,19 +41,29 @@
                         'dikirim' => $dikirim,
                         'tersedia' => max($dikirim - $sudahDiretur, 0),
                         'harga' => $harga,
+                        'diskon_per_unit' => $diskonPerUnit,
                     ];
                 })
                 ->values();
 
             return [
                 'id' => $pengiriman->id_pengiriman_pesanan,
-                'label' => 'Pengiriman #' .
-                    $pengiriman->id_pengiriman_pesanan .
+                'label' => 'PG-' .
+                    \Carbon\Carbon::parse($pengiriman->tanggal)->format('Y') .
+                    '-' .
+                    str_pad(
+                        (string) $pengiriman->id_pengiriman_pesanan,
+                        3,
+                        '0',
+                        STR_PAD_LEFT
+                    ) .
                     ' — ' .
                     ($pesanan?->no_pesanan ?? '-'),
                 'no_pesanan' => $pesanan?->no_pesanan ?? '',
                 'nama_pembeli' => $pesanan?->nama_pembeli ?? '',
                 'alamat_pembeli' => $pesanan?->alamat ?? '',
+                'faktur_jumlah' => (float) ($pengiriman->fakturPenjualan?->jumlah ?? 0),
+                'faktur_ppn' => (float) ($pengiriman->fakturPenjualan?->ppn ?? 0),
                 'items' => $items,
             ];
         })->values();
@@ -239,7 +259,7 @@
                                 id="no_retur"
                                 name="no_retur"
                                 class="form-control"
-                                value="{{ old('no_retur') }}"
+                                value="{{ old('no_retur', $nextNoRetur) }}"
                                 placeholder="Contoh: RTJ-2026-001"
                                 maxlength="255"
                                 required
@@ -672,13 +692,38 @@
                 if (item) {
                     priceInput.value = item.harga;
                     quantityInput.value = item.tersedia > 0 ? 1 : 0;
+
+                    discountInput.value = (
+                        Number(item.diskon_per_unit || 0) *
+                        Number(quantityInput.value || 0)
+                    ).toFixed(2);
+
+                    discountInput.dataset.userEdited = '';
                 }
 
                 updateRow(row);
             });
 
-            [quantityInput, priceInput, discountInput].forEach(input => {
-                input.addEventListener('input', () => updateRow(row));
+            quantityInput.addEventListener('input', () => {
+                const item = shipment.items.find(
+                    entry => entry.sku === skuSelect.value
+                );
+
+                if (item && discountInput.dataset.userEdited !== 'true') {
+                    discountInput.value = (
+                        Number(item.diskon_per_unit || 0) *
+                        Math.max(Number(quantityInput.value) || 0, 0)
+                    ).toFixed(2);
+                }
+
+                updateRow(row);
+            });
+
+            priceInput.addEventListener('input', () => updateRow(row));
+
+            discountInput.addEventListener('input', () => {
+                discountInput.dataset.userEdited = 'true';
+                updateRow(row);
             });
 
             row.querySelector('[data-remove-row]').addEventListener(
@@ -763,7 +808,22 @@
                 subtotal += Math.max(quantity * price - discount, 0);
             });
 
-            const ppn = Number(ppnInput.value) || 0;
+            const shipment = currentShipment();
+            const invoiceSubtotal = Number(shipment?.faktur_jumlah) || 0;
+            const invoicePpn = Number(shipment?.faktur_ppn) || 0;
+
+            let ppn = Number(ppnInput.value) || 0;
+
+            if (invoiceSubtotal > 0) {
+                ppn = Math.round(
+                    (subtotal / invoiceSubtotal) * invoicePpn * 100
+                ) / 100;
+
+                ppnInput.value = ppn.toFixed(2);
+                ppnInput.readOnly = true;
+            } else {
+                ppnInput.readOnly = false;
+            }
 
             document.getElementById('subtotal-display').textContent =
                 formatRupiah(subtotal);
