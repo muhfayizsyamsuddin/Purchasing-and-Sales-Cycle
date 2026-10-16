@@ -13,19 +13,6 @@
             'kondisi_barang' => '',
             'keterangan' => '',
         ]]);
-
-        $orderOptions = $pesanans->map(function ($pesanan) {
-            return [
-                'value' => $pesanan->no_order_pembelian,
-                'items' => $pesanan->details->map(function ($detail) {
-                    return [
-                        'sku' => $detail->sku,
-                        'label' => $detail->sku . ' — ' .
-                            ($detail->barang?->nama_barang ?? 'Barang tidak ditemukan'),
-                    ];
-                })->values()->all(),
-            ];
-        })->values()->all();
     @endphp
 
     <div class="penerimaan-form-page">
@@ -153,10 +140,9 @@
                 </div>
             @endif
 
-            @if ($pesanans->isEmpty())
+            @if (empty($orderOptions))
                 <div class="banner banner-danger" role="alert">
-                    Belum ada Pesanan Pembelian. Buat pesanan terlebih dahulu
-                    sebelum mencatat penerimaan barang.
+                    Tidak ada barang yang masih bisa diterima dari Pesanan Pembelian yang tersedia.
                 </div>
 
                 <a
@@ -183,7 +169,7 @@
                                 type="text"
                                 id="no_penerimaan"
                                 name="no_penerimaan"
-                                value="{{ old('no_penerimaan') }}"
+                                value="{{ old('no_penerimaan', $nextNoPenerimaan) }}"
                                 class="form-control @error('no_penerimaan') is-invalid @enderror"
                                 maxlength="255"
                                 placeholder="Masukkan nomor penerimaan"
@@ -227,13 +213,12 @@
                             >
                                 <option value="">Pilih pesanan pembelian</option>
 
-                                @foreach ($pesanans as $pesanan)
+                                @foreach ($orderOptions as $pesanan)
                                     <option
-                                        value="{{ $pesanan->no_order_pembelian }}"
-                                        @selected(old('no_order_pembelian') == $pesanan->no_order_pembelian)
+                                        value="{{ $pesanan['value'] }}"
+                                        @selected(old('no_order_pembelian') == $pesanan['value'])
                                     >
-                                        {{ $pesanan->no_order_pembelian }}
-                                        — {{ $pesanan->vendor?->nama_vendor ?? 'Tanpa vendor' }}
+                                        {{ $pesanan['label'] }}
                                     </option>
                                 @endforeach
                             </select>
@@ -357,7 +342,7 @@
         </x-gentelella::card>
     </div>
 
-    @if ($pesanans->isNotEmpty())
+    @if (!empty($orderOptions))
         <template id="detail-row-template">
             <tr data-detail-row>
                 <td>
@@ -443,12 +428,23 @@
                         select.replaceChildren(new Option('Pilih barang', ''));
 
                         items.forEach(item => {
-                            select.add(new Option(item.label, item.sku));
+                            const option = new Option(item.label, item.sku);
+                            option.dataset.availableQuantity = String(item.kuantitas);
+                            select.add(option);
                         });
 
                         select.value = items.some(item => item.sku === previousSku)
                             ? previousSku
                             : '';
+                        const row = select.closest('[data-detail-row]');
+                        const quantity = row.querySelector('[name$="[kuantitas]"]');
+                        const selectedOption = select.selectedOptions[0];
+
+                        if (selectedOption?.value) {
+                            quantity.max = selectedOption.dataset.availableQuantity;
+                        } else {
+                            quantity.removeAttribute('max');
+                        }
 
                         select.dataset.selectedSku = '';
                         select.disabled = items.length === 0;
@@ -496,6 +492,25 @@
                     }
 
                     refreshSkuOptions();
+                });
+
+                detailRows.addEventListener('change', function (event) {
+                    if (!event.target.matches('[data-sku-select]')) {
+                        return;
+                    }
+
+                    const select = event.target;
+                    const option = select.selectedOptions[0];
+                    const row = select.closest('[data-detail-row]');
+                    const quantity = row.querySelector('[name$="[kuantitas]"]');
+
+                    if (option?.value) {
+                        quantity.max = option.dataset.availableQuantity;
+                        quantity.value = option.dataset.availableQuantity;
+                    } else {
+                        quantity.removeAttribute('max');
+                        quantity.value = 1;
+                    }
                 });
 
                 orderSelect.addEventListener('change', refreshSkuOptions);

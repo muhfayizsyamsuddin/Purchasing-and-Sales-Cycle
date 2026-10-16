@@ -8,6 +8,7 @@ use App\Models\PenerimaanBarang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class PenerimaanBarangController extends Controller
@@ -34,11 +35,80 @@ class PenerimaanBarangController extends Controller
             ->orderBy('no_order_pembelian')
             ->get();
 
+        // Hitung total kuantitas yang sudah diterima per pesanan dan SKU.
+        $receivedQuantities = DB::table('penerimaan_barang as p')
+            ->join(
+                'detail_m_penerimaan_barang as d',
+                'd.no_penerimaan',
+                '=',
+                'p.no_penerimaan'
+            )
+            ->select(
+                'p.no_order_pembelian',
+                'd.sku',
+                DB::raw('SUM(d.kuantitas) as received_quantity')
+            )
+            ->groupBy('p.no_order_pembelian', 'd.sku')
+            ->get()
+            ->keyBy(fn ($row) => $row->no_order_pembelian . '|' . $row->sku);
+
+        // Kirim hanya barang yang masih memiliki sisa untuk diterima.
+        $orderOptions = $pesanans->map(function ($pesanan) use ($receivedQuantities) {
+            $items = $pesanan->details->map(function ($detail) use (
+                $pesanan,
+                $receivedQuantities
+            ) {
+                $key = $pesanan->no_order_pembelian . '|' . $detail->sku;
+
+                $sudahDiterima = (int) (
+                    $receivedQuantities->get($key)->received_quantity ?? 0
+                );
+
+                $sisa = max(
+                    (int) $detail->kuantitas - $sudahDiterima,
+                    0
+                );
+
+                return [
+                    'sku' => $detail->sku,
+                    'label' => $detail->sku . ' — '
+                        . ($detail->barang?->nama_barang ?? 'Barang tidak ditemukan'),
+                    'kuantitas' => $sisa,
+                ];
+            })
+                ->filter(fn ($item) => $item['kuantitas'] > 0)
+                ->values();
+
+            return [
+                'value' => $pesanan->no_order_pembelian,
+                'label' => $pesanan->no_order_pembelian
+                    . ' — '
+                    . ($pesanan->vendor?->nama_vendor ?? 'Tanpa vendor'),
+                'items' => $items->all(),
+            ];
+        })
+            ->filter(fn ($order) => count($order['items']) > 0)
+            ->values()
+            ->all();
+
         $barangs = MBarang::orderBy('nama_barang')->get();
+
+        // Buat nomor penerimaan berikutnya, misalnya PB-2026-003.
+        $prefix = 'PB-' . now()->format('Y') . '-';
+
+        $lastSequence = PenerimaanBarang::query()
+            ->where('no_penerimaan', 'like', $prefix . '%')
+            ->selectRaw(
+                'MAX(CAST(SUBSTRING(no_penerimaan, 9) AS UNSIGNED)) as max_sequence'
+            )
+            ->value('max_sequence');
+
+        $nextNoPenerimaan = $prefix
+            . str_pad((string) ((int) $lastSequence + 1), 3, '0', STR_PAD_LEFT);
 
         return view(
             'penerimaan-barang.create',
-            compact('pesanans', 'barangs')
+            compact('pesanans', 'barangs', 'orderOptions', 'nextNoPenerimaan')
         );
     }
 
@@ -47,6 +117,7 @@ class PenerimaanBarangController extends Controller
         $validated = $request->validate(
             $this->validationRules($request)
         );
+        $this->validateAvailableQuantities($validated);
 
         try {
             DB::transaction(function () use ($validated) {
@@ -121,6 +192,7 @@ class PenerimaanBarangController extends Controller
         $validated = $request->validate(
             $this->validationRules($request, $penerimaan)
         );
+        $this->validateAvailableQuantities($validated, $penerimaan);
 
         try {
             DB::transaction(function () use ($penerimaan, $validated) {
@@ -177,6 +249,57 @@ class PenerimaanBarangController extends Controller
                 'error',
                 'Penerimaan barang gagal dihapus.'
             );
+        }
+    }
+
+    private function validateAvailableQuantities(
+        array $validated,
+        ?PenerimaanBarang $existing = null
+    ): void {
+        $noOrder = $validated['no_order_pembelian'];
+
+        foreach ($validated['details'] as $index => $detail) {
+            $sku = $detail['sku'];
+
+            $orderedQuantity = (int) DB::table('detail_m_pesanan_pembelian')
+                ->where('no_order_pembelian', $noOrder)
+                ->where('sku', $sku)
+                ->value('kuantitas');
+
+            $receivedQuery = DB::table('penerimaan_barang as p')
+                ->join(
+                    'detail_m_penerimaan_barang as d',
+                    'd.no_penerimaan',
+                    '=',
+                    'p.no_penerimaan'
+                )
+                ->where('p.no_order_pembelian', $noOrder)
+                ->where('d.sku', $sku);
+
+            // Saat edit, penerimaan yang sedang diedit tidak dihitung
+            // sebagai penerimaan lain.
+            if ($existing !== null) {
+                $receivedQuery->where(
+                    'p.no_penerimaan',
+                    '!=',
+                    $existing->no_penerimaan
+                );
+            }
+
+            $alreadyReceived = (int) $receivedQuery->sum('d.kuantitas');
+
+            $remainingQuantity = max(
+                $orderedQuantity - $alreadyReceived,
+                0
+            );
+
+            if ((int) $detail['kuantitas'] > $remainingQuantity) {
+                throw ValidationException::withMessages([
+                    "details.$index.kuantitas" =>
+                        "Kuantitas penerimaan SKU {$sku} melebihi sisa pesanan. "
+                        . "Maksimal yang dapat diterima: {$remainingQuantity} unit.",
+                ]);
+            }
         }
     }
 
