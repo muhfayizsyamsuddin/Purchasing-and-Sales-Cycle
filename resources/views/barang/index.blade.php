@@ -24,11 +24,6 @@
         </x-gentelella::page-header>
 
         <x-gentelella::card title="Daftar Barang">
-            @if (session('success'))
-                <div class="banner banner-success" role="status">
-                    {{ session('success') }}
-                </div>
-            @endif
 
             <x-gentelella::table :datatable="true" :page-length="10" style="width:100%; table-layout:fixed;">
                 <thead>
@@ -59,7 +54,6 @@
                                         action="{{ route('barang.destroy', $barang->sku) }}"
                                         method="POST"
                                         style="display: inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus barang ini?')"
                                     >
                                         @csrf
                                         @method('DELETE')

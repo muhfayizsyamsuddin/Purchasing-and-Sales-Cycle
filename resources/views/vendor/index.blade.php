@@ -23,11 +23,6 @@
         </x-gentelella::page-header>
 
         <x-gentelella::card title="Daftar Vendor">
-            @if (session('success'))
-                <div class="banner banner-success" role="status">
-                    {{ session('success') }}
-                </div>
-            @endif
 
             <x-gentelella::table
                 :datatable="true"
@@ -67,7 +62,6 @@
                                         action="{{ route('vendor.destroy', $vendor->id_vendor) }}"
                                         method="POST"
                                         style="display:inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus vendor ini?')"
                                     >
                                         @csrf
                                         @method('DELETE')

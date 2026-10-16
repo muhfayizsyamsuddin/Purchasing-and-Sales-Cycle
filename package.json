@@ -18,6 +18,8 @@
     },
     "dependencies": {
         "gentelella": "4.2.0",
-        "sass": "1.105.1"
+        "notyf": "^3.10.0",
+        "sass": "1.105.1",
+        "sweetalert2": "^11.26.25"
     }
 }

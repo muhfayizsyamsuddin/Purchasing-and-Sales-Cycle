@@ -130,7 +130,6 @@
                                         action="{{ route('pesanan-pembelian.destroy', $pesanan->no_order_pembelian) }}"
                                         method="POST"
                                         style="display:inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus pesanan ini?')"
                                     >
                                         @csrf
                                         @method('DELETE')

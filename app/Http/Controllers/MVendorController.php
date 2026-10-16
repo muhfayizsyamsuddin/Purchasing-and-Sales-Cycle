@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MVendor;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class MVendorController extends Controller
 {
@@ -65,7 +66,21 @@ class MVendorController extends Controller
     public function destroy(int $vendor)
     {
         $vendor = MVendor::findOrFail($vendor);
-        $vendor->delete();
+
+        try {
+            $vendor->delete();
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return redirect()
+                    ->route('vendor.index')
+                    ->with(
+                        'error',
+                        'Vendor tidak dapat dihapus karena masih digunakan dalam transaksi.'
+                    );
+            }
+
+            throw $e;
+        }
 
         return redirect()
             ->route('vendor.index')

@@ -116,7 +116,6 @@
                                         action="{{ route('pesanan-penjualan.destroy', $pesanan->no_pesanan) }}"
                                         method="POST"
                                         style="display:inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus pesanan ini?')"
                                     >
                                         @csrf
                                         @method('DELETE')

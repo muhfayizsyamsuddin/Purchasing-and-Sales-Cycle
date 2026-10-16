@@ -104,7 +104,6 @@
                                         action="{{ route('users.destroy', $user) }}"
                                         method="POST"
                                         style="display:inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus user ini?')"
                                     >
                                         @csrf
                                         @method('DELETE')

@@ -109,7 +109,6 @@
                                         action="{{ route('permintaan-pembelian.destroy', $permintaan->no_faktur) }}"
                                         method="POST"
                                         style="display:inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus permintaan ini?')"
                                     >
                                         @csrf
                                         @method('DELETE')

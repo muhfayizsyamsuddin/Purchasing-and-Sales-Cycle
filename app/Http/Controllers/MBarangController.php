@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MBarang;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\QueryException;
 
 class MBarangController extends Controller
 {
@@ -79,7 +80,21 @@ class MBarangController extends Controller
     public function destroy(string $sku)
     {
         $barang = MBarang::findOrFail($sku);
-        $barang->delete();
+
+        try {
+            $barang->delete();
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return redirect()
+                    ->route('barang.index')
+                    ->with(
+                        'error',
+                        'Barang tidak dapat dihapus karena masih digunakan dalam transaksi.'
+                    );
+            }
+
+            throw $e;
+        }
 
         return redirect()
             ->route('barang.index')

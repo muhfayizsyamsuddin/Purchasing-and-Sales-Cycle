@@ -133,7 +133,6 @@
                                         action="{{ route('retur-penjualan.destroy', $retur->no_retur) }}"
                                         method="POST"
                                         style="display:inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus retur penjualan ini?')"
                                     >
                                         @csrf
                                         @method('DELETE')

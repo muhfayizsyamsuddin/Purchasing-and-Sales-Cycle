@@ -127,7 +127,6 @@
                                         action="{{ route('retur-pembelian.destroy', $retur->no_retur) }}"
                                         method="POST"
                                         style="display:inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus retur pembelian ini?')"
                                     >
                                         @csrf
                                         @method('DELETE')

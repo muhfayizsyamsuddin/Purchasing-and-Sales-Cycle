@@ -121,7 +121,6 @@
                                         action="{{ route('faktur-penjualan.destroy', $faktur->no_faktur) }}"
                                         method="POST"
                                         style="display:inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus faktur ini?')"
                                     >
                                         @csrf
                                         @method('DELETE')
