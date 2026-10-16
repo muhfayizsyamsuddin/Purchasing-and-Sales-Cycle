@@ -23,7 +23,7 @@
         </x-gentelella::page-header>
 
         <x-gentelella::card title="Daftar Pesanan Pembelian">
-            @if (session('success'))
+            <!-- @if (session('success'))
                 <div class="banner banner-success" role="status">
                     {{ session('success') }}
                 </div>
@@ -33,7 +33,7 @@
                 <div class="banner banner-danger" role="alert">
                     {{ session('error') }}
                 </div>
-            @endif
+            @endif -->
 
             <style>
                 .pesanan-pembelian-table {
