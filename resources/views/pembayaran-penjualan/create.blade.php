@@ -167,7 +167,7 @@
                                 type="text"
                                 id="no_pembayaran"
                                 name="no_pembayaran"
-                                value="{{ old('no_pembayaran') }}"
+                                value="{{ old('no_pembayaran', $nextNoPembayaran) }}"
                                 class="form-control"
                                 maxlength="255"
                                 placeholder="Contoh: PBAY-PJ-2026-001"
@@ -353,7 +353,9 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     const fakturSelect = document.getElementById('no_faktur');
                     const terimaDari = document.getElementById('terima_dari');
+                    const untukPembayaranInput = document.getElementById('untuk_pembayaran');
                     const jumlahInput = document.getElementById('jumlah');
+                    const terbilangInput = document.getElementById('terbilang');
                     const summary = document.getElementById('tagihan-summary');
                     const totalElement = document.getElementById('total-faktur');
                     const paidElement = document.getElementById('sudah-dibayar');
@@ -369,6 +371,83 @@
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2
                         }).format(value);
+                    }
+
+                    function terbilangAngka(number) {
+                        const satuan = [
+                            '', 'satu', 'dua', 'tiga', 'empat', 'lima',
+                            'enam', 'tujuh', 'delapan', 'sembilan',
+                            'sepuluh', 'sebelas'
+                        ];
+
+                        if (number === 0) return '';
+                        if (number < 12) return satuan[number];
+
+                        if (number < 20) {
+                            return `${terbilangAngka(number - 10)} belas`;
+                        }
+
+                        if (number < 100) {
+                            return `${terbilangAngka(Math.floor(number / 10))} puluh ${terbilangAngka(number % 10)}`;
+                        }
+
+                        if (number < 200) {
+                            return `seratus ${terbilangAngka(number - 100)}`;
+                        }
+
+                        if (number < 1000) {
+                            return `${terbilangAngka(Math.floor(number / 100))} ratus ${terbilangAngka(number % 100)}`;
+                        }
+
+                        if (number < 2000) {
+                            return `seribu ${terbilangAngka(number - 1000)}`;
+                        }
+
+                        if (number < 1000000) {
+                            return `${terbilangAngka(Math.floor(number / 1000))} ribu ${terbilangAngka(number % 1000)}`;
+                        }
+
+                        if (number < 1000000000) {
+                            return `${terbilangAngka(Math.floor(number / 1000000))} juta ${terbilangAngka(number % 1000000)}`;
+                        }
+
+                        if (number < 1000000000000) {
+                            return `${terbilangAngka(Math.floor(number / 1000000000))} miliar ${terbilangAngka(number % 1000000000)}`;
+                        }
+
+                        if (number < 1000000000000000) {
+                            return `${terbilangAngka(Math.floor(number / 1000000000000))} triliun ${terbilangAngka(number % 1000000000000)}`;
+                        }
+
+                        return String(number);
+                    }
+
+                    function updateTerbilang() {
+                        const value = jumlahInput.value;
+
+                        if (value === '' || !Number.isFinite(Number(value)) || Number(value) < 0) {
+                            terbilangInput.value = '';
+                            return;
+                        }
+
+                        const totalSen = Math.round(Number(value) * 100);
+                        const rupiah = Math.floor(totalSen / 100);
+                        const sen = totalSen % 100;
+
+                        let hasil = rupiah === 0
+                            ? 'nol'
+                            : terbilangAngka(rupiah);
+
+                        hasil += ' rupiah';
+
+                        if (sen > 0) {
+                            hasil += ` dan ${terbilangAngka(sen)} sen`;
+                        }
+
+                        terbilangInput.value = hasil
+                            .replace(/\s+/g, ' ')
+                            .trim()
+                            .replace(/^./, huruf => huruf.toUpperCase());
                     }
 
                     function updateTagihan() {
@@ -408,8 +487,20 @@
                     }
 
                     fakturSelect.addEventListener('change', function () {
-                        terimaDari.value = '';
+                        const selected = fakturOptions.find(
+                            faktur => faktur.value === fakturSelect.value
+                        );
+
+                        terimaDari.value = selected?.nama ?? '';
+                        untukPembayaranInput.value = selected
+                            ? 'Pembayaran faktur penjualan ' + selected.value
+                            : '';
+                        jumlahInput.value = selected ? selected.sisa.toFixed(2) : '';
+
+                        jumlahInput.setCustomValidity('');
+
                         updateTagihan();
+                        updateTerbilang();
                     });
 
                     jumlahInput.addEventListener('input', function () {
@@ -425,7 +516,8 @@
                             jumlahInput.setCustomValidity('');
                         }
                     });
-
+                    jumlahInput.addEventListener('input', updateTerbilang);
+                    updateTerbilang();
                     updateTagihan();
                 });
             </script>

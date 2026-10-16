@@ -41,8 +41,27 @@ class PembayaranPenjualanController extends Controller
             })
             ->filter(fn ($faktur) => $faktur->sisa_tagihan > 0)
             ->values();
+        $prefix = 'PBAY-PJ-' . now()->format('Y') . '-';
 
-        return view('pembayaran-penjualan.create', compact('fakturs'));
+        $lastSequence = PembayaranPenjualan::query()
+            ->where('no_pembayaran', 'like', $prefix . '%')
+            ->pluck('no_pembayaran')
+            ->map(function ($number) use ($prefix) {
+                return preg_match(
+                    '/^' . preg_quote($prefix, '/') . '(\d+)$/',
+                    $number,
+                    $matches
+                ) ? (int) $matches[1] : 0;
+            })
+            ->max() ?? 0;
+
+        $nextNoPembayaran = $prefix
+            . str_pad((string) ($lastSequence + 1), 3, '0', STR_PAD_LEFT);
+
+        return view(
+            'pembayaran-penjualan.create',
+            compact('fakturs', 'nextNoPembayaran')
+        );
     }
 
     public function store(Request $request)
