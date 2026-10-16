@@ -27,7 +27,27 @@ class PesananPembelianController extends Controller
         $vendors = MVendor::orderBy('nama_vendor')->get();
         $barangs = MBarang::orderBy('nama_barang')->get();
 
-        return view('pesanan-pembelian.create', compact('vendors', 'barangs'));
+        $prefix = 'PO-' . now()->format('Y') . '-';
+
+        $lastSequence = PesananPembelian::query()
+            ->where('no_order_pembelian', 'like', $prefix . '%')
+            ->pluck('no_order_pembelian')
+            ->map(function ($number) use ($prefix) {
+                return preg_match(
+                    '/^' . preg_quote($prefix, '/') . '(\d+)$/',
+                    $number,
+                    $matches
+                ) ? (int) $matches[1] : 0;
+            })
+            ->max() ?? 0;
+
+        $nextNoOrder = $prefix
+            . str_pad((string) ($lastSequence + 1), 3, '0', STR_PAD_LEFT);
+
+        return view(
+            'pesanan-pembelian.create',
+            compact('vendors', 'barangs', 'nextNoOrder')
+        );
     }
 
     public function store(Request $request)

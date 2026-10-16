@@ -234,7 +234,7 @@
                                     type="text"
                                     id="no_retur"
                                     name="no_retur"
-                                    value="{{ old('no_retur') }}"
+                                    value="{{ old('no_retur', $nextNoRetur) }}"
                                     class="form-control"
                                     maxlength="255"
                                     placeholder="Contoh: RT-2026-001"

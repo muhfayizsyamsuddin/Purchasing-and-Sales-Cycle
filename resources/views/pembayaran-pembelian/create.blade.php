@@ -179,7 +179,7 @@
                                 type="text"
                                 id="no_pembayaran"
                                 name="no_pembayaran"
-                                value="{{ old('no_pembayaran') }}"
+                                value="{{ old('no_pembayaran', $nextNoPembayaran) }}"
                                 class="form-control"
                                 maxlength="255"
                                 placeholder="Contoh: PBAY-2026-001"

@@ -208,7 +208,7 @@
                                     type="text"
                                     id="no_faktur"
                                     name="no_faktur"
-                                    value="{{ old('no_faktur') }}"
+                                    value="{{ old('no_faktur', $nextNoFaktur) }}"
                                     class="form-control"
                                     maxlength="255"
                                     required

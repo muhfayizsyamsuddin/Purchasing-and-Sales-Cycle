@@ -37,9 +37,26 @@ class FakturPembelianController extends Controller
 
         $barangs = MBarang::orderBy('nama_barang')->get();
 
+        $prefix = 'FB-' . now()->format('Y') . '-';
+
+        $lastSequence = FakturPembelian::query()
+            ->where('no_faktur', 'like', $prefix . '%')
+            ->pluck('no_faktur')
+            ->map(function ($number) use ($prefix) {
+                return preg_match(
+                    '/^' . preg_quote($prefix, '/') . '(\d+)$/',
+                    $number,
+                    $matches
+                ) ? (int) $matches[1] : 0;
+            })
+            ->max() ?? 0;
+
+        $nextNoFaktur = $prefix
+            . str_pad((string) ($lastSequence + 1), 3, '0', STR_PAD_LEFT);
+
         return view(
             'faktur-pembelian.create',
-            compact('penerimaans', 'barangs')
+            compact('penerimaans', 'barangs', 'nextNoFaktur')
         );
     }
 

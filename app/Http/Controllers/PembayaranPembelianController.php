@@ -28,9 +28,26 @@ class PembayaranPembelianController extends Controller
             ->orderByDesc('tanggal')
             ->get();
 
+        $prefix = 'PBAY-PO-' . now()->format('Y') . '-';
+
+        $lastSequence = PembayaranPembelian::query()
+            ->where('no_pembayaran', 'like', $prefix . '%')
+            ->pluck('no_pembayaran')
+            ->map(function ($number) use ($prefix) {
+                return preg_match(
+                    '/^' . preg_quote($prefix, '/') . '(\d+)$/',
+                    $number,
+                    $matches
+                ) ? (int) $matches[1] : 0;
+            })
+            ->max() ?? 0;
+
+        $nextNoPembayaran = $prefix
+            . str_pad((string) ($lastSequence + 1), 3, '0', STR_PAD_LEFT);
+
         return view(
             'pembayaran-pembelian.create',
-            compact('fakturs')
+            compact('fakturs', 'nextNoPembayaran')
         );
     }
 

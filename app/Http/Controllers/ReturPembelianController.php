@@ -28,7 +28,27 @@ class ReturPembelianController extends Controller
     {
         $penerimaans = $this->getPenerimaans();
 
-        return view('retur-pembelian.create', compact('penerimaans'));
+        $prefix = 'RTP-' . now()->format('Y') . '-';
+
+        $lastSequence = ReturPembelian::query()
+            ->where('no_retur', 'like', $prefix . '%')
+            ->pluck('no_retur')
+            ->map(function ($number) use ($prefix) {
+                return preg_match(
+                    '/^' . preg_quote($prefix, '/') . '(\d+)$/',
+                    $number,
+                    $matches
+                ) ? (int) $matches[1] : 0;
+            })
+            ->max() ?? 0;
+
+        $nextNoRetur = $prefix
+            . str_pad((string) ($lastSequence + 1), 3, '0', STR_PAD_LEFT);
+
+        return view(
+            'retur-pembelian.create',
+            compact('penerimaans', 'nextNoRetur')
+        );
     }
 
     public function store(Request $request)

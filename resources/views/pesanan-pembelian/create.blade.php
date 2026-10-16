@@ -148,7 +148,7 @@
                             type="text"
                             id="no_order_pembelian"
                             name="no_order_pembelian"
-                            value="{{ old('no_order_pembelian') }}"
+                            value="{{ old('no_order_pembelian', $nextNoOrder) }}"
                             class="form-control @error('no_order_pembelian') is-invalid @enderror"
                             maxlength="255"
                             placeholder="Masukkan nomor order"

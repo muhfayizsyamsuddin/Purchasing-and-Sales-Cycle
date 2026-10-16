@@ -141,7 +141,7 @@
                             type="text"
                             id="no_faktur"
                             name="no_faktur"
-                            value="{{ old('no_faktur') }}"
+                            value="{{ old('no_faktur', $nextNoPermintaan) }}"
                             class="form-control @error('no_faktur') is-invalid @enderror"
                             maxlength="255"
                             placeholder="Masukkan nomor permintaan"

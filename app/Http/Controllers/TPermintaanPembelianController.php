@@ -28,9 +28,26 @@ class TPermintaanPembelianController extends Controller
     {
         $barangs = MBarang::orderBy('nama_barang')->get();
 
+        $prefix = 'PP-' . now()->format('Y') . '-';
+
+        $lastSequence = TPermintaanPembelian::query()
+            ->where('no_faktur', 'like', $prefix . '%')
+            ->pluck('no_faktur')
+            ->map(function ($number) use ($prefix) {
+                return preg_match(
+                    '/^' . preg_quote($prefix, '/') . '(\d+)$/',
+                    $number,
+                    $matches
+                ) ? (int) $matches[1] : 0;
+            })
+            ->max() ?? 0;
+
+        $nextNoPermintaan = $prefix
+            . str_pad((string) ($lastSequence + 1), 3, '0', STR_PAD_LEFT);
+
         return view(
             'permintaan-pembelian.create',
-            compact('barangs')
+            compact('barangs', 'nextNoPermintaan')
         );
     }
 
