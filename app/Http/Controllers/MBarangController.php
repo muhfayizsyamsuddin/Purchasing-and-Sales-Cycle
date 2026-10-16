@@ -18,7 +18,24 @@ class MBarangController extends Controller
 
     public function create()
     {
-        return view('barang.create');
+        $prefix = 'BRG-';
+
+        $lastSequence = MBarang::query()
+            ->where('sku', 'like', $prefix . '%')
+            ->pluck('sku')
+            ->map(function ($sku) use ($prefix) {
+                return preg_match(
+                    '/^' . preg_quote($prefix, '/') . '(\d+)$/',
+                    $sku,
+                    $matches
+                ) ? (int) $matches[1] : 0;
+            })
+            ->max() ?? 0;
+
+        $nextSku = $prefix
+            . str_pad((string) ($lastSequence + 1), 3, '0', STR_PAD_LEFT);
+
+        return view('barang.create', compact('nextSku'));
     }
 
     public function store(Request $request)

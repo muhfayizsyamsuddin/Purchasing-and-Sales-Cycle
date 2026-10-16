@@ -70,7 +70,7 @@
                             type="text"
                             id="sku"
                             name="sku"
-                            value="{{ old('sku') }}"
+                            value="{{ old('sku', $nextSku) }}"
                             class="form-control @error('sku') is-invalid @enderror"
                             maxlength="255"
                             placeholder="Masukkan SKU barang"
