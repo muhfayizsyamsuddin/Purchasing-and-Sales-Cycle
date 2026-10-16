@@ -144,7 +144,7 @@
                             value="{{ old('no_faktur') }}"
                             class="form-control @error('no_faktur') is-invalid @enderror"
                             maxlength="255"
-                            placeholder="Masukkan nomor faktur"
+                            placeholder="Masukkan nomor permintaan"
                             required
                         >
 

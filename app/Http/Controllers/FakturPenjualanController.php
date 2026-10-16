@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\QueryException;
 
 class FakturPenjualanController extends Controller
 {
@@ -170,7 +171,19 @@ class FakturPenjualanController extends Controller
     public function destroy(string $no_faktur)
     {
         $faktur = FakturPenjualan::findOrFail($no_faktur);
-        $faktur->delete();
+
+        try {
+            $faktur->delete();
+        } catch (QueryException $e) {
+            report($e);
+
+            return redirect()
+                ->route('faktur-penjualan.index')
+                ->with(
+                    'error',
+                    'Faktur tidak dapat dihapus karena masih memiliki Pembayaran Penjualan.'
+                );
+        }
 
         return redirect()
             ->route('faktur-penjualan.index')

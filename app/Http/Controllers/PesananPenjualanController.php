@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\QueryException;
 
 class PesananPenjualanController extends Controller
 {
@@ -180,7 +181,19 @@ class PesananPenjualanController extends Controller
     public function destroy(string $no_pesanan)
     {
         $pesanan = PesananPenjualan::findOrFail($no_pesanan);
-        $pesanan->delete();
+
+        try {
+            $pesanan->delete();
+        } catch (QueryException $e) {
+            report($e);
+
+            return redirect()
+                ->route('pesanan-penjualan.index')
+                ->with(
+                    'error',
+                    'Pesanan tidak dapat dihapus karena masih digunakan oleh transaksi terkait.'
+                );
+        }
 
         return redirect()
             ->route('pesanan-penjualan.index')

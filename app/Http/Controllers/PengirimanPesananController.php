@@ -8,6 +8,7 @@ use App\Models\PesananPenjualan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\QueryException;
 
 class PengirimanPesananController extends Controller
 {
@@ -145,7 +146,18 @@ class PengirimanPesananController extends Controller
             $id_pengiriman_pesanan
         );
 
-        $pengiriman->delete();
+        try {
+            $pengiriman->delete();
+        } catch (QueryException $e) {
+            report($e);
+
+            return redirect()
+                ->route('pengiriman-pesanan.index')
+                ->with(
+                    'error',
+                    'Pengiriman tidak dapat dihapus karena masih digunakan oleh Faktur Penjualan atau Retur Penjualan.'
+                );
+        }
 
         return redirect()
             ->route('pengiriman-pesanan.index')
