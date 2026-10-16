@@ -17,6 +17,7 @@ class PengirimanPesananController extends Controller
             'pesananPenjualan',
             'details.barang',
         ])
+            ->withSum('details', 'total')
             ->orderByDesc('tanggal')
             ->paginate(10);
 
@@ -30,8 +31,23 @@ class PengirimanPesananController extends Controller
         ])
             ->orderByDesc('tanggal')
             ->get();
+        $shippedQuantities = PengirimanPesanan::with('details')
+            ->get()
+            ->flatMap(function ($pengiriman) {
+                return $pengiriman->details->map(function ($detail) use ($pengiriman) {
+                    return [
+                        'key' => $pengiriman->no_pesanan . '|' . $detail->sku,
+                        'quantity' => (int) $detail->total,
+                    ];
+                });
+            })
+            ->groupBy('key')
+            ->map(fn ($rows) => (int) $rows->sum('quantity'));
 
-        return view('pengiriman-pesanan.create', compact('pesanans'));
+        return view(
+            'pengiriman-pesanan.create',
+            compact('pesanans', 'shippedQuantities')
+        );
     }
 
     public function store(Request $request)

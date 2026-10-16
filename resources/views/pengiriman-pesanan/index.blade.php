@@ -76,7 +76,7 @@
                         <th>No. Pesanan</th>
                         <th>Nama Pembeli</th>
                         <th>Nama Pengirim</th>
-                        <th>Jumlah Detail</th>
+                        <th>Total Kuantitas</th>
                         <th data-orderable="false">Aksi</th>
                     </tr>
                 </thead>
@@ -93,7 +93,7 @@
                                 {{ $pengiriman->pesananPenjualan?->nama_pembeli ?? '-' }}
                             </td>
                             <td>{{ $pengiriman->nama_pengirim }}</td>
-                            <td>{{ $pengiriman->details_count ?? $pengiriman->details->count() }}</td>
+                            <td>{{ $pengiriman->details_sum_total ?? 0 }}</td>
                             <td>
                                 @can('pengiriman-pesanan.update')
                                     <a

@@ -19,15 +19,27 @@
 
         $nextIndex = max(array_map('intval', array_keys($oldDetails))) + 1;
 
-        $orderItems = $pesanans->mapWithKeys(function ($pesanan) {
+        $orderItems = $pesanans->mapWithKeys(function ($pesanan) use ($shippedQuantities) {
             $items = $pesanan->details
-                ->map(function ($detail) {
+                ->groupBy('sku')
+                ->map(function ($details, $sku) use ($pesanan, $shippedQuantities) {
+                    $key = $pesanan->no_pesanan . '|' . $sku;
+
+                    $orderedQuantity = (int) $details->sum('kuantitas');
+                    $shippedQuantity = (int) $shippedQuantities->get($key, 0);
+
+                    $remainingQuantity = max(
+                        $orderedQuantity - $shippedQuantity,
+                        0
+                    );
+
                     return [
-                        'sku' => $detail->sku,
-                        'nama_barang' => $detail->barang?->nama_barang ?? '-',
+                        'sku' => $sku,
+                        'nama_barang' => $details->first()->barang?->nama_barang ?? '-',
+                        'available_quantity' => $remainingQuantity,
                     ];
                 })
-                ->unique('sku')
+                ->filter(fn ($item) => $item['available_quantity'] > 0)
                 ->values();
 
             return [$pesanan->no_pesanan => $items];
@@ -405,6 +417,8 @@
                                 item.sku
                             );
 
+                            option.dataset.availableQuantity = String(item.available_quantity);
+
                             select.add(option);
                         });
 
@@ -412,6 +426,16 @@
                             select.value = selectedSKU;
                         } else {
                             select.value = '';
+                        }
+
+                        const row = select.closest('[data-detail-row]');
+                        const quantityInput = row?.querySelector('input[name$="[total]"]');
+                        const selectedOption = select.selectedOptions[0];
+
+                        if (quantityInput && selectedOption?.value) {
+                            quantityInput.max = selectedOption.dataset.availableQuantity;
+                        } else if (quantityInput) {
+                            quantityInput.removeAttribute('max');
                         }
 
                         select.disabled = !orderSelect.value || items.length === 0;
@@ -428,6 +452,29 @@
                             }
                         );
                     }
+
+                    detailRows.addEventListener('change', function (event) {
+                        if (!event.target.matches('[data-sku-select]')) {
+                            return;
+                        }
+
+                        const select = event.target;
+                        const option = select.selectedOptions[0];
+                        const row = select.closest('[data-detail-row]');
+                        const quantityInput = row?.querySelector('input[name$="[total]"]');
+
+                        if (!quantityInput) {
+                            return;
+                        }
+
+                        if (option?.value) {
+                            quantityInput.max = option.dataset.availableQuantity;
+                            quantityInput.value = option.dataset.availableQuantity;
+                        } else {
+                            quantityInput.removeAttribute('max');
+                            quantityInput.value = 1;
+                        }
+                    });
 
                     orderSelect.addEventListener('change', populateAllRows);
 

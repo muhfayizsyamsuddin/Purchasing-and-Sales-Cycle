@@ -1,4 +1,14 @@
-
+@php
+    $nomorPengiriman = 'PG-'
+        . \Carbon\Carbon::parse($pengiriman->tanggal)->format('Y')
+        . '-'
+        . str_pad(
+            (string) $pengiriman->id_pengiriman_pesanan,
+            3,
+            '0',
+            STR_PAD_LEFT
+        );
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -284,8 +294,8 @@
             <div>
                 <h2 class="document-title">PENGIRIMAN PESANAN</h2>
                 <div class="text-right">
-                    ID Pengiriman:
-                    <strong>{{ $pengiriman->id_pengiriman_pesanan }}</strong>
+                    No. Pengiriman:
+                    <strong>{{ $nomorPengiriman }}</strong>
                 </div>
             </div>
         </header>
@@ -296,8 +306,8 @@
             <div class="information-grid">
                 <table class="information-table">
                     <tr>
-                        <td>ID Pengiriman</td>
-                        <td>{{ $pengiriman->id_pengiriman_pesanan }}</td>
+                        <td>No. Pengiriman</td>
+                        <td>{{ $nomorPengiriman }}</td>
                     </tr>
                     <tr>
                         <td>No. Pesanan</td>
