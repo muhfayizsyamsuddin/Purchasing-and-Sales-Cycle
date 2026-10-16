@@ -73,7 +73,7 @@
                         <th>Tanggal Penerimaan</th>
                         <th>No. Order Pembelian</th>
                         <th>Vendor</th>
-                        <th>Jumlah Detail</th>
+                        <th>Total Kuantitas</th>
                         <th data-orderable="false">Aksi</th>
                     </tr>
                 </thead>
@@ -87,7 +87,7 @@
                             </td>
                             <td>{{ $penerimaan->no_order_pembelian }}</td>
                             <td>{{ $penerimaan->pesanan?->vendor?->nama_vendor ?? '-' }}</td>
-                            <td>{{ $penerimaan->details_count }}</td>
+                            <td>{{ $penerimaan->details_sum_kuantitas ?? 0 }}</td>
                             <td>
                                 @can('penerimaan-barang.update')
                                     <a

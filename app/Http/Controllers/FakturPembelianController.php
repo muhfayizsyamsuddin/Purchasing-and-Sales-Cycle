@@ -18,7 +18,7 @@ class FakturPembelianController extends Controller
         $fakturs = FakturPembelian::with([
             'penerimaan.pesanan.vendor',
         ])
-            ->withCount('details')
+            ->withSum('details', 'kuantitas')
             ->orderByDesc('tanggal')
             ->paginate(10);
 

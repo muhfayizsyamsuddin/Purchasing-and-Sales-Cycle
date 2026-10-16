@@ -15,7 +15,7 @@ class PenerimaanBarangController extends Controller
     public function index()
     {
         $penerimaans = PenerimaanBarang::with('pesanan.vendor')
-            ->withCount('details')
+            ->withSum('details', 'kuantitas')
             ->orderByDesc('tanggal')
             ->paginate(10);
 

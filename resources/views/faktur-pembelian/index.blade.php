@@ -79,7 +79,7 @@
                         <th>Jumlah</th>
                         <th>PPN</th>
                         <th>Total Harga</th>
-                        <th>Jumlah Detail</th>
+                        <th>Total Kuantitas</th>
                         <th data-orderable="false">Aksi</th>
                     </tr>
                 </thead>
@@ -100,7 +100,7 @@
                             <td>
                                 {{ number_format((float) $faktur->total_harga, 2, ',', '.') }}
                             </td>
-                            <td>{{ $faktur->details_count }}</td>
+                            <td>{{ $faktur->details_sum_kuantitas ?? 0 }}</td>
                             <td>
                                 @can('faktur-pembelian.view')
                                     <a

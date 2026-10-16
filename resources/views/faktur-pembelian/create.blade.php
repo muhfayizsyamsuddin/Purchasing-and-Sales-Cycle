@@ -22,6 +22,9 @@
                     . ($penerimaan->pesanan?->no_order_pembelian ?? '-')
                     . ' — '
                     . ($penerimaan->pesanan?->vendor?->nama_vendor ?? '-'),
+                'vendor' => [
+                    'nama' => $penerimaan->pesanan?->vendor?->nama_vendor ?? '',
+                ],
 
                 'items' => $penerimaan->details->map(function ($detail) use ($penerimaan) {
                     $pesananDetail = \Illuminate\Support\Facades\DB::table('detail_m_pesanan_pembelian')
@@ -36,6 +39,7 @@
                             . ($detail->barang?->nama_barang ?? 'Barang tidak ditemukan'),
                         'kuantitas' => (int) $detail->kuantitas,
                         'harga_unit' => (float) ($pesananDetail?->harga_unit ?? 0),
+                        'diskon' => (float) ($pesananDetail?->diskon ?? 0),
                     ];
                 })->values()->all(),
             ];
@@ -551,6 +555,7 @@
                     document.addEventListener('DOMContentLoaded', function () {
                         const receiptSelect = document.getElementById('no_penerimaan');
                         const detailRows = document.getElementById('detail-rows');
+                        const vendorNameInput = document.getElementById('nama');
                         const template = document.getElementById('detail-row-template');
                         const addButton = document.getElementById('add-detail');
                         const helpText = document.getElementById('receipt-items-help');
@@ -562,6 +567,9 @@
                             const selectedReceipt = receiptOptions.find(
                                 receipt => String(receipt.value) === receiptSelect.value
                             );
+                            if (vendorNameInput) {
+                                vendorNameInput.value = selectedReceipt?.vendor?.nama ?? '';
+                            }
 
                             const items = selectedReceipt ? selectedReceipt.items : [];
 
@@ -580,6 +588,7 @@
                                     option.value = String(item.sku);
                                     option.dataset.availableQuantity = String(item.kuantitas);
                                     option.dataset.unitPrice = String(item.harga_unit);
+                                    option.dataset.discount = String(item.diskon ?? 0);
 
                                     select.appendChild(option);
                                 });
@@ -598,6 +607,11 @@
 
                                     if (!price.dataset.userEdited) {
                                         price.value = selectedOption.dataset.unitPrice;
+                                    }
+                                    const discount = row.querySelector('input[data-discount]');
+
+                                    if (discount && !discount.dataset.userEdited) {
+                                        discount.value = selectedOption.dataset.discount || '0';
                                     }
                                 } else {
                                     quantity.removeAttribute('max');
@@ -627,11 +641,21 @@
 
                                 price.value = option.dataset.unitPrice;
                                 price.dataset.userEdited = '';
+
+                                const discount = row.querySelector('input[data-discount]');
+
+                                if (discount) {
+                                    discount.value = option.dataset.discount || '0';
+                                    discount.dataset.userEdited = '';
+                                }
                             }
                         });
 
                         detailRows.addEventListener('input', function (event) {
                             if (event.target.matches('[data-price-input]')) {
+                                event.target.dataset.userEdited = 'true';
+                            }
+                            if (event.target.matches('input[data-discount]')) {
                                 event.target.dataset.userEdited = 'true';
                             }
                         });
@@ -666,7 +690,7 @@
                                 row.querySelector('[data-quantity-input]').value = 1;
                                 row.querySelector('[data-price-input]').value = 0;
                                 row.querySelector('[data-price-input]').dataset.userEdited = '';
-                                row.querySelector('[data-discount]').value = 0;
+                                row.querySelector('input[data-discount]').value = 0;
                             }
 
                             refreshSkuOptions();

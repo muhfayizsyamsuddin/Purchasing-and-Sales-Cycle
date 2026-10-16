@@ -14,6 +14,7 @@ class TPermintaanPembelianController extends Controller
     public function index()
     {
         $permintaans = TPermintaanPembelian::with('details.barang')
+            ->withSum('details', 'kuantitas')
             ->latest('no_faktur')
             ->paginate(10);
 

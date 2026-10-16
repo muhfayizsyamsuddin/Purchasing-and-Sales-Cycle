@@ -71,7 +71,7 @@
                         <th>No. Permintaan</th>
                         <th>Tanggal</th>
                         <th>Tanggal Diperlukan</th>
-                        <th>Jumlah Detail</th>
+                        <th>Total Kuantitas</th>
                         <th data-orderable="false">Aksi</th>
                     </tr>
                 </thead>
@@ -86,7 +86,7 @@
                             <td>
                                 {{ $permintaan->tanggal_diperlukan ? \Carbon\Carbon::parse($permintaan->tanggal_diperlukan)->format('d/m/Y') : '-' }}
                             </td>
-                            <td>{{ $permintaan->details->count() }}</td>
+                            <td>{{ $permintaan->details_sum_kuantitas ?? 0 }}</td>
                             <td>
                                 @can('permintaan-pembelian.update')
                                     <a

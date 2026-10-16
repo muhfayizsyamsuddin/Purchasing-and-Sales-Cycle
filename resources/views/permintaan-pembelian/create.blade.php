@@ -134,7 +134,7 @@
                 <div class="permintaan-form-grid">
                     <div class="form-group">
                         <label for="no_faktur" class="form-label">
-                            No. Faktur <span class="required">*</span>
+                            No. Permintaan <span class="required">*</span>
                         </label>
 
                         <input
