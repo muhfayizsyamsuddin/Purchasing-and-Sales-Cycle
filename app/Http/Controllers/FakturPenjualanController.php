@@ -33,8 +33,27 @@ class FakturPenjualanController extends Controller
             ->whereDoesntHave('fakturPenjualan')
             ->orderByDesc('tanggal')
             ->get();
+        $prefix = 'FJ-' . now()->format('Y') . '-';
 
-        return view('faktur-penjualan.create', compact('pengirimans'));
+        $lastSequence = FakturPenjualan::query()
+            ->where('no_faktur', 'like', $prefix . '%')
+            ->pluck('no_faktur')
+            ->map(function ($number) use ($prefix) {
+                return preg_match(
+                    '/^' . preg_quote($prefix, '/') . '(\d+)$/',
+                    $number,
+                    $matches
+                ) ? (int) $matches[1] : 0;
+            })
+            ->max() ?? 0;
+
+        $nextNoFaktur = $prefix
+            . str_pad((string) ($lastSequence + 1), 3, '0', STR_PAD_LEFT);
+
+        return view(
+            'faktur-penjualan.create',
+            compact('pengirimans', 'nextNoFaktur')
+        );
     }
 
     public function store(Request $request)

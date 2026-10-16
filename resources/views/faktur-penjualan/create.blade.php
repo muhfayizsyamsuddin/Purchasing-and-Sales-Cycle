@@ -25,20 +25,34 @@
 
         $nextIndex = max(array_map('intval', array_keys($oldDetails))) + 1;
 
+        $shipmentInfo = $pengirimans->mapWithKeys(function ($pengiriman) {
+            $pesanan = $pengiriman->pesananPenjualan;
+
+            return [
+                (string) $pengiriman->id_pengiriman_pesanan => [
+                    'nama' => $pesanan?->nama_pembeli ?? '',
+                    'alamat' => $pesanan?->alamat ?? '',
+                    'ppn' => (float) ($pesanan?->ppn ?? 0),
+                ],
+            ];
+        });
+
         $pengirimanItems = $pengirimans->mapWithKeys(function ($pengiriman) {
-            $pesananDetails = $pengiriman->pesananPenjualan?->details
-                ?? collect();
+            $pesananDetails = $pengiriman->pesananPenjualan?->details ?? collect();
 
             $items = $pengiriman->details
                 ->groupBy('sku')
                 ->map(function ($rows, $sku) use ($pesananDetails) {
                     $sourceDetail = $pesananDetails->firstWhere('sku', $sku);
+                    $orderQuantity = max((int) ($sourceDetail?->kuantitas ?? 1), 1);
 
                     return [
                         'sku' => $sku,
                         'nama_barang' => $rows->first()->barang?->nama_barang ?? '-',
                         'available_quantity' => (int) $rows->sum('total'),
                         'unit_price' => (float) ($sourceDetail?->harga_unit ?? 0),
+                        'discount_per_unit' =>
+                            (float) ($sourceDetail?->diskon ?? 0) / $orderQuantity,
                     ];
                 })
                 ->values();
@@ -198,7 +212,7 @@
                                 id="no_faktur"
                                 name="no_faktur"
                                 class="form-control"
-                                value="{{ old('no_faktur') }}"
+                                value="{{ old('no_faktur', $nextNoFaktur) }}"
                                 maxlength="255"
                                 required
                             >
@@ -209,7 +223,7 @@
 
                         <div class="form-group">
                             <label for="id_pengiriman_pesanan" class="form-label">
-                                ID Pengiriman <span class="required">*</span>
+                                No. Pengiriman <span class="required">*</span>
                             </label>
                             <select
                                 id="id_pengiriman_pesanan"
@@ -223,7 +237,7 @@
                                         value="{{ $pengiriman->id_pengiriman_pesanan }}"
                                         @selected(old('id_pengiriman_pesanan') == $pengiriman->id_pengiriman_pesanan)
                                     >
-                                        {{ $pengiriman->id_pengiriman_pesanan }}
+                                        {{ 'PG-' . \Carbon\Carbon::parse($pengiriman->tanggal)->format('Y') . '-' . str_pad((string) $pengiriman->id_pengiriman_pesanan, 3, '0', STR_PAD_LEFT) }}
                                         — {{ $pengiriman->no_pesanan }}
                                         — {{ $pengiriman->pesananPenjualan?->nama_pembeli ?? '-' }}
                                     </option>
@@ -531,15 +545,37 @@
                     const detailRows = document.getElementById('detail-rows');
                     const addButton = document.getElementById('add-detail');
                     const template = document.getElementById('detail-row-template');
+                    const namaInput = document.getElementById('nama');
+                    const alamatInput = document.getElementById('alamat');
+                    const ppnInput = document.getElementById('ppn');
+
+                    const shipmentInfo = @json($shipmentInfo);
 
                     const shipmentItems = @json($pengirimanItems);
                     let nextIndex = {{ $nextIndex }};
+
+                    function populateShipmentInfo() {
+                        const info = shipmentInfo[deliverySelect.value];
+
+                        if (namaInput) {
+                            namaInput.value = info?.nama ?? '';
+                        }
+
+                        if (alamatInput) {
+                            alamatInput.value = info?.alamat ?? '';
+                        }
+
+                        if (ppnInput) {
+                            ppnInput.value = info?.ppn ?? 0;
+                        }
+                    }
 
                     function updateRow(select, fillPrice = false) {
                         const row = select.closest('[data-detail-row]');
                         const quantityInput = row.querySelector('[data-quantity-input]');
                         const priceInput = row.querySelector('[data-price-input]');
                         const option = select.selectedOptions[0];
+                        const discountInput = row.querySelector('input[name$="[diskon]"]');
 
                         if (!option || !option.value) {
                             quantityInput.removeAttribute('max');
@@ -559,6 +595,13 @@
                         if (fillPrice || Number(priceInput.value) === 0) {
                             priceInput.value = option.dataset.unitPrice || 0;
                         }
+                        if (discountInput && fillPrice) {
+                            discountInput.dataset.userEdited = '';
+                            discountInput.value = (
+                                Number(option.dataset.discountPerUnit || 0) *
+                                Number(quantityInput.value || 0)
+                            ).toFixed(2);
+                        }
                     }
 
                     function populateSKUSelect(select, selectedSKU = '') {
@@ -574,6 +617,7 @@
 
                             option.dataset.availableQuantity = item.available_quantity;
                             option.dataset.unitPrice = item.unit_price;
+                            option.dataset.discountPerUnit = item.discount_per_unit;
                             select.add(option);
                         });
 
@@ -606,12 +650,40 @@
                     }
 
                     deliverySelect.addEventListener('change', function () {
+                        populateShipmentInfo();
                         populateAllRows();
                     });
 
                     detailRows.addEventListener('change', function (event) {
                         if (event.target.matches('[data-sku-select]')) {
                             updateRow(event.target, true);
+                        }
+                    });
+
+                    detailRows.addEventListener('input', function (event) {
+                        if (event.target.matches('input[name$="[diskon]"]')) {
+                            event.target.dataset.userEdited = 'true';
+                            return;
+                        }
+
+                        if (!event.target.matches('[data-quantity-input]')) {
+                            return;
+                        }
+
+                        const row = event.target.closest('[data-detail-row]');
+                        const select = row.querySelector('[data-sku-select]');
+                        const option = select.selectedOptions[0];
+                        const discountInput = row.querySelector('input[name$="[diskon]"]');
+
+                        if (
+                            option?.value &&
+                            discountInput &&
+                            discountInput.dataset.userEdited !== 'true'
+                        ) {
+                            discountInput.value = (
+                                Number(option.dataset.discountPerUnit || 0) *
+                                Number(event.target.value || 0)
+                            ).toFixed(2);
                         }
                     });
 
@@ -650,6 +722,7 @@
                         button.closest('[data-detail-row]').remove();
                     });
 
+                    populateShipmentInfo();
                     populateAllRows();
                 });
             </script>

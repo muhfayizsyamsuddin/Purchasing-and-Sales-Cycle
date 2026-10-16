@@ -350,8 +350,13 @@
 
                 <table class="information-table">
                     <tr>
-                        <td>ID Pengiriman</td>
-                        <td>{{ $faktur->id_pengiriman_pesanan }}</td>
+                        <td>No. Pengiriman</td>
+                        <td>
+                            {{ $faktur->pengirimanPesanan
+                                ? 'PG-' . \Carbon\Carbon::parse($faktur->pengirimanPesanan->tanggal)->format('Y')
+                                    . '-' . str_pad((string) $faktur->id_pengiriman_pesanan, 3, '0', STR_PAD_LEFT)
+                                : '-' }}
+                        </td>
                     </tr>
                     <tr>
                         <td>No. Pesanan</td>
