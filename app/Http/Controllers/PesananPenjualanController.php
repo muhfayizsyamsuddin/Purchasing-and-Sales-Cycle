@@ -24,7 +24,27 @@ class PesananPenjualanController extends Controller
     {
         $barangs = MBarang::orderBy('nama_barang')->get();
 
-        return view('pesanan-penjualan.create', compact('barangs'));
+        $prefix = 'PJ-' . now()->format('Y') . '-';
+
+        $lastSequence = PesananPenjualan::query()
+            ->where('no_pesanan', 'like', $prefix . '%')
+            ->pluck('no_pesanan')
+            ->map(function ($number) use ($prefix) {
+                return preg_match(
+                    '/^' . preg_quote($prefix, '/') . '(\d+)$/',
+                    $number,
+                    $matches
+                ) ? (int) $matches[1] : 0;
+            })
+            ->max() ?? 0;
+
+        $nextNoPesanan = $prefix
+            . str_pad((string) ($lastSequence + 1), 3, '0', STR_PAD_LEFT);
+
+        return view(
+            'pesanan-penjualan.create',
+            compact('barangs', 'nextNoPesanan')
+        );
     }
 
     public function store(Request $request)

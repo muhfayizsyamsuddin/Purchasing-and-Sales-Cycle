@@ -172,7 +172,7 @@
                                 type="text"
                                 id="no_pesanan"
                                 name="no_pesanan"
-                                value="{{ old('no_pesanan') }}"
+                                value="{{ old('no_pesanan', $nextNoPesanan) }}"
                                 class="form-control"
                                 maxlength="255"
                                 required
