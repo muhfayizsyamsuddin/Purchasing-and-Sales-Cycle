@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Allow requests already inside Laravel public directory
+    RewriteRule ^public/ - [L]
+
+    # Block access to sensitive root files
+    RewriteRule ^(\.env|\.env\.production|artisan|composer\.(json|lock)|phpunit\.xml|\.git) - [F,L]
+
+    # Route public requests to Laravel
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
